@@ -14,10 +14,10 @@ class PrototypicalNetwork(nn.Module):
     def __init__(self, input_units, hidden_units, output_units):
         super(PrototypicalNetwork, self).__init__()
         self.net = nn.Sequential(
-            self._conv_layer(input_units, hidden_units, 16, 1),
-            self._conv_layer(hidden_units, hidden_units, 8, 1),
-            self._conv_layer(hidden_units, hidden_units, 3, 1),
-            self._conv_layer(hidden_units, output_units, 3, 1),
+            self._conv_layer(input_units, hidden_units, 64, 1),
+            self._conv_layer(hidden_units, hidden_units, 64, 1),
+            self._conv_layer(hidden_units, hidden_units, 64, 1),
+            self._conv_layer(hidden_units, output_units, 64, 1),
         )
 
     def forward(self, x):
