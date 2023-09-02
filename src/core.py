@@ -92,7 +92,8 @@ def train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
     loaders = build_dataloaders(dataset, train_numway, train_kquery, test_numway, test_kquery)
     train_loader, valid_loader, test_loader = loaders
     device = build_device(use_gpu)
-    model = PrototypicalNetwork(1, 64, 64, kernel_size=64).to(device)
+    model = PrototypicalNetwork().to(device)
+    print(model)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.5)
