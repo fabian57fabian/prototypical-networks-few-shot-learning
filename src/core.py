@@ -1,5 +1,6 @@
 import os
 
+import learn2learn.vision.models
 import torch
 from torch.utils.data import DataLoader
 import numpy as np
@@ -101,16 +102,16 @@ def train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
     train_loss = []
     train_acc = []
     for epoch in range(epochs):
-        print(f"Ep {epoch}")
         model.train()
         # Train
         for i in range(100): # should be enough to cover batch*100 >= dataset_size
             batch = next(iter(train_loader))
             optimizer.zero_grad()
             x, y = batch
-            x = x.to(device)
+            x = x.squeeze(0).to(device)
+            y = y.to(device)
             model_out = model(x)
-            loss, acc = prototypical_loss(model_out.to('cpu'), y, number_support)
+            loss, acc = prototypical_loss(model_out, y, number_support)
             loss.backward()
             optimizer.step()
             train_loss.append(loss.item())
