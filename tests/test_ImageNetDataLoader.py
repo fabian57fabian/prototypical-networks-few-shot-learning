@@ -1,0 +1,39 @@
+import os
+import shutil
+from unittest import TestCase
+from src.MiniImagenetDataset import MiniImagenetDataset, download_dataset
+
+
+class TestMiniImagenetDataset(TestCase):
+    def test_constructor_download(self):
+        _dts_dir = "datasets"
+        if os.path.exists(_dts_dir): shutil.rmtree(_dts_dir)
+        dl = MiniImagenetDataset(batch_size=16, load_on_ram=False, download=True)
+        assert os.path.exists(dl.dts_dir)
+        assert len(os.listdir(dl.dts_dir)) == 3
+
+    def test_constructor_onram(self):
+        _dts_dir = "datasets_ram"
+        if os.path.exists(_dts_dir): shutil.rmtree(_dts_dir)
+        dl = MiniImagenetDataset(batch_size=16, load_on_ram=True, download=True, tmp_dir=_dts_dir)
+        assert os.path.exists(dl.dts_dir)
+        assert len(os.listdir(dl.dts_dir)) == 3
+
+    def test_download_dataset(self):
+        _dir = "tmp_dts"
+        if os.path.exists(_dir): shutil.rmtree(_dir)
+        download_dataset(_dir)
+        assert os.path.exists(_dir)
+        train_dir = os.path.join(_dir, "train")
+        val_dir = os.path.join(_dir, "val")
+        test_dir = os.path.join(_dir, "test")
+
+        assert os.path.exists(train_dir)
+        assert len(os.listdir(train_dir)) == 64
+
+        assert os.path.exists(val_dir)
+        assert len(os.listdir(val_dir)) == 16
+
+        assert os.path.exists(test_dir)
+        assert len(os.listdir(test_dir)) == 20
+

@@ -21,7 +21,7 @@ def euclidean_dist(x, y):
     return torch.pow(x - y, 2).sum(2)
 
 
-def prototypical_loss(model_out, y, number_support):
+def prototypical_loss(model, x, y, number_support):
     '''
     Compute the barycentres by averaging the features of n_support samples
     Args:
@@ -30,6 +30,7 @@ def prototypical_loss(model_out, y, number_support):
     - n_support: number of samples to keep in account when computing
       barycentres, for each one of the current classes
     '''
+    model_out = model(x)
     classes = torch.unique(model_out)
     n_classes = len(classes)
 
