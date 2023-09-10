@@ -58,9 +58,10 @@ def train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
             batch = train_loader.GetSample(train_num_classes, number_support, train_num_query)
             optimizer.zero_grad()
             x, y = batch
-            x = x.squeeze(0).to(device)
+            x = x.to(device)
             y = y.to(device)
-            loss, acc = prototypical_loss(model, x, y, number_support)
+            x = model(x)
+            loss, acc = prototypical_loss(x, y, number_support, train_num_classes)
             loss.backward()
             optimizer.step()
             train_loss.append(loss.item())

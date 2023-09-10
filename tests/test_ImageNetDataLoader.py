@@ -19,6 +19,18 @@ class TestMiniImagenetDataset(TestCase):
         assert os.path.exists(dl.dts_dir)
         assert len(os.listdir(dl.dts_dir)) == 3
 
+    def test_getsample(self):
+        _dts_dir = "datasets_sample"
+        if os.path.exists(_dts_dir): shutil.rmtree(_dts_dir)
+        dl = MiniImagenetDataset(batch_size=16, load_on_ram=True, download=True, tmp_dir=_dts_dir)
+        NC, NS, NQ = 20, 5, 6
+        sample = dl.GetSample(NC, NS, NQ)
+        x, y = sample
+        shx = x.shape
+        shy = y.shape
+        assert shx[0] == NC * (NS + NQ) and shx[1] == 3 and shx[2] == dl.IMAGE_SIZE[0] and shx[3] == dl.IMAGE_SIZE[1]
+        assert shy[0] == NC * (NS + NQ)
+
     def test_download_dataset(self):
         _dir = "tmp_dts"
         if os.path.exists(_dir): shutil.rmtree(_dir)

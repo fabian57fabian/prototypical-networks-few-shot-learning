@@ -2,6 +2,8 @@ import torch
 from torch.nn import functional as F
 from torch.nn.modules import Module
 
+from torch.autograd import Variable
+
 
 def euclidean_dist(x, y):
     '''
@@ -21,28 +23,34 @@ def euclidean_dist(x, y):
     return torch.pow(x - y, 2).sum(2)
 
 
-def prototypical_loss(model, x, y, number_support):
+def prototypical_loss(out: torch.tensor, target: torch.tensor, n_support: int, n_classes: int):
     '''
     Compute the barycentres by averaging the features of n_support samples
-    Args:
-    - input: the model output for a batch of samples (already on cpu)
-    - target: ground truth for the above batch of samples (already on cpu)
-    - n_support: number of samples to keep in account when computing
-      barycentres, for each one of the current classes
     '''
-    model_out = model(x)
-    classes = torch.unique(model_out)
-    n_classes = len(classes)
 
-    # n_query, n_target constants
-    n_query = model_out.eq(classes[0].item()).sum().item() - number_support
+    target_cpu = target.to('cpu')
+    out_cpu = out.to('cpu')
 
-    support_idxs = [model_out.eq(c).nonzero()[:number_support].squeeze(1) for c in classes]
+    # input is made by (NQ + NS) for each NC.
+    # batch = NC * (NS + NQ)
+    # out should be [batch * 1600]
 
-    prototypes = torch.stack([y[idx_list].mean(0) for idx_list in support_idxs])
-    query_idxs = torch.stack(list(map(lambda c: model_out.eq(c).nonzero()[number_support:], classes))).view(-1)
+    batch_size = out_cpu.shape[0]
+    n_query = int( (batch_size - (n_classes * n_support)) / n_classes )
 
-    query_samples = model_out.to('cpu')[query_idxs]
+    indexes_support = []
+    indexes_query = []
+    for i in range(n_classes):
+        start = i * (n_support + n_query)
+        stop = (i + 1) * (n_support + n_query)
+        indexes_support += list(range(start, start + n_support, 1))
+        indexes_query += list(range(start + n_support, stop, 1))
+
+    #support = torch.index_select(out_cpu, 0, torch.LongTensor(indexes_support))
+    query_samples = torch.index_select(out_cpu, 0, torch.LongTensor(indexes_query))
+
+    prototypes = torch.stack([out_cpu[idx_list].mean(0) for idx_list in indexes_support])
+
     dists = euclidean_dist(query_samples, prototypes)
 
     log_p_y = F.log_softmax(-dists, dim=1).view(n_classes, n_query, -1)

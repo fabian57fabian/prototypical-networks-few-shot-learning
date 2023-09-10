@@ -13,4 +13,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     train(args.dataset, args.epochs, args.gpu, args.learning_rate,
-          args.train_num_classes, args.train_num_query, args.number_support)
+          args.train_num_class, args.train_num_query, args.number_support)
