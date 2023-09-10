@@ -36,22 +36,24 @@ def build_device(use_gpu=False):
 def train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
           train_num_classes=30,
           train_num_query=15,
-          number_support=5):
+          number_support=5,
+          episodes_per_epoch=50):
     loaders = build_dataloaders(dataset)
     train_loader, valid_loader, test_loader = loaders
     device = build_device(use_gpu)
+    print(f"Creating Prototype model on {device}")
     model = PrototypicalNetwork().to(device)
-    print(model)
+    #print(model)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.5)
 
     train_loss = []
     train_acc = []
+    print("Startring training")
     for epoch in range(epochs):
         model.train()
         # Train
-        episodes_per_epoch = 100
         for i in tqdm(range(episodes_per_epoch), total=episodes_per_epoch): # should be enough to cover batch*100 >= dataset_size
             batch = train_loader.GetSample(train_num_classes, number_support, train_num_query)
             optimizer.zero_grad()
