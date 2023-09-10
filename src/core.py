@@ -27,7 +27,7 @@ def build_device(use_gpu=False):
     device = torch.device("cpu")
     if use_gpu:
         if torch.cuda.is_available():
-            device = torch.device("cuda")
+            device = torch.device("cuda:0")
         else:
             print("WWARN: Unable to set device to GPU because not available. Fallback to 'cpu'")
     return device
