@@ -33,11 +33,30 @@ def build_device(use_gpu=False):
     return device
 
 
+def init_savemodel() -> str:
+    main_dir = "runs"
+    if not os.path.exists(main_dir): os.mkdir(main_dir)
+    i = 0
+    build_dir = lambda idx: f"{main_dir}/train_{idx}"
+    out_dir = build_dir(i)
+    while os.path.exists(out_dir):
+        out_dir = build_dir(i)
+        i += 1
+    os.mkdir(out_dir)
+    return out_dir
+
+
+def save_model(model, training_dir, name):
+    torch.save(model.state_dict(), os.path.join(training_dir, name))
+
+
 def train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
           train_num_classes=30,
           train_num_query=15,
           number_support=5,
-          episodes_per_epoch=50):
+          episodes_per_epoch=50,
+          save_each=5):
+    training_dir = init_savemodel()
     loaders = build_dataloaders(dataset)
     train_loader, valid_loader, test_loader = loaders
     device = build_device(use_gpu)
@@ -50,6 +69,10 @@ def train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
 
     train_loss = []
     train_acc = []
+    val_loss = []
+    val_acc = []
+    best_acc = -1
+
     print("Startring training")
     for epoch in range(epochs):
         model.train()
@@ -66,10 +89,27 @@ def train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
             optimizer.step()
             train_loss.append(loss.item())
             train_acc.append(acc.item())
-        print(f'Ep {epoch}, Avg Train loss: {np.mean(train_loss)}, Avg Train acc: {np.mean(train_acc)}')
+        if epoch % save_each == 0:
+            save_model(model, training_dir, f"model_{epoch}.pt")
+        loss_mean, acc_mean = np.mean(train_loss[-episodes_per_epoch:]),np.mean(train_acc[-episodes_per_epoch:])
+        print(f'Ep {epoch}: Avg Train loss: {loss_mean}, Avg Train acc: {acc_mean}')
         lr_scheduler.step()
 
-        # TODO: validate
+        # Val
+        model.eval()
+        for i in tqdm(range(5), total=5):
+            batch = valid_loader.GetSample(train_num_classes, number_support, train_num_query)
+            x, y = batch
+            x = x.to(device)
+            y = y.to(device)
+            x = model(x)
+            loss, acc = prototypical_loss(x, y, number_support, train_num_classes)
+            train_loss.append(loss.item())
+            train_acc.append(acc.item())
+        avg_loss = np.mean(val_loss[-episodes_per_epoch:])
+        avg_acc = np.mean(val_acc[-episodes_per_epoch:])
+        print(f"Avg Val Loss: {avg_loss}, Avg Val Acc: {avg_acc}")
+        if avg_acc > best_acc:
+            save_model(model, training_dir, f"model_best.pt")
 
-        # TODO: test
 
