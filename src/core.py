@@ -3,6 +3,8 @@ import os
 import learn2learn.vision.models
 import torch
 from torch.utils.data import DataLoader
+from torch.utils.tensorboard import SummaryWriter
+
 import numpy as np
 
 from tqdm import tqdm
@@ -17,10 +19,12 @@ from src.MiniImagenetDataset import MiniImagenetDataset
 
 def build_dataloaders(dataset='mini_imagenet'):
     if dataset == 'mini_imagenet':
+        # Loading datasets
         train_loader = MiniImagenetDataset(mode='train', batch_size=16, load_on_ram=True, download=True, tmp_dir="datasets")
         valid_loader = MiniImagenetDataset(mode='val', batch_size=16, load_on_ram=True, download=False, tmp_dir="datasets")
         test_loader = MiniImagenetDataset(mode='test', batch_size=16, load_on_ram=True, download=False, tmp_dir="datasets")
         return train_loader, valid_loader, test_loader
+    assert False, "dataset unknown"
 
 
 def build_device(use_gpu=False):
@@ -52,11 +56,14 @@ def save_model(model, training_dir, name):
 
 def train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
           train_num_classes=30,
+          test_num_class=5,
           train_num_query=15,
           number_support=5,
           episodes_per_epoch=50,
           save_each=5):
     training_dir = init_savemodel()
+    print(f"Writing to {training_dir}")
+    writer = SummaryWriter(log_dir=training_dir)
     loaders = build_dataloaders(dataset)
     train_loader, valid_loader, test_loader = loaders
     device = build_device(use_gpu)
@@ -89,6 +96,8 @@ def train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
             optimizer.step()
             train_loss.append(loss.item())
             train_acc.append(acc.item())
+            writer.add_scalar("Loss/train", train_loss[-1], epoch)
+            writer.add_scalar("Acc/train", train_acc[-1], epoch)
         if epoch % save_each == 0:
             save_model(model, training_dir, f"model_{epoch}.pt")
         loss_mean, acc_mean = np.mean(train_loss[-episodes_per_epoch:]),np.mean(train_acc[-episodes_per_epoch:])
@@ -97,19 +106,23 @@ def train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
 
         # Val
         model.eval()
-        for i in tqdm(range(5), total=5):
-            batch = valid_loader.GetSample(train_num_classes, number_support, train_num_query)
+        for i in tqdm(range(episodes_per_epoch), total=episodes_per_epoch):
+            batch = valid_loader.GetSample(test_num_class, number_support, train_num_query)
             x, y = batch
             x = x.to(device)
             y = y.to(device)
             x = model(x)
-            loss, acc = prototypical_loss(x, y, number_support, train_num_classes)
-            train_loss.append(loss.item())
-            train_acc.append(acc.item())
+            loss, acc = prototypical_loss(x, y, number_support, test_num_class)
+            val_loss.append(loss.item())
+            val_acc.append(acc.item())
+            writer.add_scalar("Loss/val", val_loss[-1], epoch)
+            writer.add_scalar("Acc/val", val_acc[-1], epoch)
         avg_loss = np.mean(val_loss[-episodes_per_epoch:])
         avg_acc = np.mean(val_acc[-episodes_per_epoch:])
         print(f"Avg Val Loss: {avg_loss}, Avg Val Acc: {avg_acc}")
         if avg_acc > best_acc:
             save_model(model, training_dir, f"model_best.pt")
 
+    writer.flush()
+    writer.close()
 

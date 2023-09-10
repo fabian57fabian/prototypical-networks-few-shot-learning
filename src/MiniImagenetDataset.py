@@ -80,7 +80,6 @@ class MiniImagenetDataset:
         return samples, torch.tensor(y)
 
     def _load_on_memory(self):
-        print("Loading dataset on cache")
         self.classes = os.listdir(self.curr_dataset_folder)
         # count all images
         # number, start, stop
@@ -109,4 +108,3 @@ class MiniImagenetDataset:
                 t_img = transforms.PILToTensor()(pil_img)
                 self.cache[cache_index, ...] = t_img
                 cache_index += 1
-        print("cache loaded")
