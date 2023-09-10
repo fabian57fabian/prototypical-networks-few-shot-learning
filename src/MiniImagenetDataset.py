@@ -76,7 +76,7 @@ class MiniImagenetDataset:
             y += [cls_y for _ in range(NS + NQ)]
 
         # select samples
-        samples = torch.index_select(self.cache, 0, torch.LongTensor(indexes))
+        samples = self.cache[indexes, ...]# torch.index_select(self.cache, 0, torch.LongTensor(indexes))
         return samples, torch.tensor(y)
 
     def _load_on_memory(self):

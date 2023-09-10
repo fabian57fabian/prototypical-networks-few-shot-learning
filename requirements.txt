@@ -1,2 +1,3 @@
 torch
-learn2learn
+torchvision
+Pillow

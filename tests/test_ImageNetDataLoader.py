@@ -1,5 +1,7 @@
 import os
 import shutil
+from datetime import datetime
+
 from unittest import TestCase
 from src.MiniImagenetDataset import MiniImagenetDataset, download_dataset
 
@@ -24,7 +26,10 @@ class TestMiniImagenetDataset(TestCase):
         if os.path.exists(_dts_dir): shutil.rmtree(_dts_dir)
         dl = MiniImagenetDataset(batch_size=16, load_on_ram=True, download=True, tmp_dir=_dts_dir)
         NC, NS, NQ = 20, 5, 6
+        start_time = datetime.now()
         sample = dl.GetSample(NC, NS, NQ)
+        duration = (datetime.now() - start_time).total_seconds() * 1000
+        print(f"GetSample ms: {duration}")
         x, y = sample
         shx = x.shape
         shy = y.shape

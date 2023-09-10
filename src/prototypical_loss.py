@@ -43,13 +43,14 @@ def prototypical_loss(out: torch.tensor, target: torch.tensor, n_support: int, n
     for i in range(n_classes):
         start = i * (n_support + n_query)
         stop = (i + 1) * (n_support + n_query)
-        indexes_support += list(range(start, start + n_support, 1))
+        indexes_support.append(list(range(start, start + n_support, 1)))
         indexes_query += list(range(start + n_support, stop, 1))
 
-    #support = torch.index_select(out_cpu, 0, torch.LongTensor(indexes_support))
-    query_samples = torch.index_select(out_cpu, 0, torch.LongTensor(indexes_query))
-
+    #indexes_support = torch.tensor(indexes_support)
     prototypes = torch.stack([out_cpu[idx_list].mean(0) for idx_list in indexes_support])
+
+    #indexes_query = torch.tensor(indexes_query)
+    query_samples = out_cpu[indexes_query]# torch.stack([out_cpu[idx_list] for idx_list in indexes_query])
 
     dists = euclidean_dist(query_samples, prototypes)
 

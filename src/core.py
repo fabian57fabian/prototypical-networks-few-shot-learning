@@ -5,14 +5,11 @@ import torch
 from torch.utils.data import DataLoader
 import numpy as np
 
+from tqdm import tqdm
+
 from src.prototypical_net import PrototypicalNetwork
 from src.prototypical_loss import prototypical_loss
 from src.MiniImagenetDataset import MiniImagenetDataset
-
-from learn2learn.vision.datasets import MiniImagenet
-from learn2learn.data import MetaDataset, Taskset
-from learn2learn.data.transforms import NWays, KShots, LoadData, RemapLabels
-
 
 # example train algo from https://github.com/pytorch/examples/blob/main/mnist/main.py
 # Loading datasets from https://github.com/learnables/learn2learn/tree/master#learning-domains
@@ -54,7 +51,8 @@ def train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
     for epoch in range(epochs):
         model.train()
         # Train
-        for i in range(100): # should be enough to cover batch*100 >= dataset_size
+        episodes_per_epoch = 100
+        for i in tqdm(range(episodes_per_epoch), total=episodes_per_epoch): # should be enough to cover batch*100 >= dataset_size
             batch = train_loader.GetSample(train_num_classes, number_support, train_num_query)
             optimizer.zero_grad()
             x, y = batch
