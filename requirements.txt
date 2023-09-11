@@ -3,3 +3,4 @@ torchvision
 tensorboard
 chardet
 Pillow
+tqdm
