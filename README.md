@@ -32,14 +32,17 @@ We used 3 main classification datasets:
   - total: 60,000
   - splits: 64 train, 16 val, 20 test (according to Vinyals et al)
   - Used in paper
+  - ![](docs/images/mini_imagenet_dataset.png)
 - **omniglot**: a collection of 1623 classes of handwritted characters. Each image is then rotated 3 more times by 90 degrees.
   - total: 32460 real, plus 4 rotations per image
   - splits: 1032 train, 172 val, 464 test (according to Vinyals et al)
   - Used in paper
+  - ![](docs/images/omniglot_dataset.jpg)
 - **flowers102**: a collection of 102 real-world flowers classes as rgb images.
   - total: 32460 real, plus 4 rotations per image
   - splits: 64 train, 16 val, 22 test (random seed for splits)
   - **NOT** Used in paper
+  - ![](docs/images/flowers102_dataset.png)
 </details>
 
 <details open>
@@ -76,7 +79,7 @@ All of these uses **epochs=200** and **iterations_per_epoch=100**.
 | Dataset       | Paper res<br><sup>(Acc) | Our res<br><sup>(Acc)                                                                                                  | Images<br><sup>(shape) | Prototype<br><sup>(shape) | Duration     |
 |---------------|-------------------------|------------------------------------------------------------------------------------------------------------------------|------------------------|---------------------------|--------------|
 | mini_imagenet | 68.20                   | [65.24](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/results/mini_imagenet/train_5way.png) | (84, 84, 3)            | (batch, 1600)             | cpu / 13h20m |
-| omniglot      | 98.80                   | [97.69](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/results/omniglot/train_5way.png)       | (28, 28, 1)            | (batch, 60)               | cpu / 2h35m  |
+| omniglot      | 98.80                   | [98.26](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/results/omniglot/train_5way.png)      | (28, 28, 1)            | (batch, 60)               | cpu / 2h35m  |
 | flowers102    | /                       | [73.81](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/results/flowers102/training_.png)     | (64, 64, 3)            | (batch, TODO)             | cpu / 5h48m  |
 
 </details>
