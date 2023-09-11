@@ -1,3 +1,4 @@
+import datetime
 import os
 
 import torch
@@ -113,8 +114,9 @@ def train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
     val_loss = []
     val_acc = []
     best_acc = -1
+    start_time = datetime.datetime.now()
 
-    print("Startring training")
+    print(f"Startring training at {str(start_time)}")
     for epoch in range(epochs):
         model.train()
         # Train
@@ -159,4 +161,6 @@ def train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
 
     writer.flush()
     writer.close()
+    duration = (datetime.datetime.now() - start_time)
+    print(f"Training duration: {str(duration)}")
 
