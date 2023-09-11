@@ -21,4 +21,4 @@ def download_dataset_miniimagenet(dest_dir):
 
 class MiniImagenetDataset(AbstractDataset):
     def __init__(self, mode='train', load_on_ram=True, download=True, tmp_dir="datasets"):
-        super().__init__(mode, (84, 84, 3), load_on_ram, download, tmp_dir, download_dataset_miniimagenet)
+        super().__init__(mode, (84, 84, 3), load_on_ram, download, tmp_dir, "mini_imagenet", download_dataset_miniimagenet)

@@ -68,4 +68,4 @@ def download_dataset_omniglot(dest_dir):
 
 class OmniglotDataset(AbstractDataset):
     def __init__(self, mode='train', load_on_ram=True, download=True, tmp_dir="datasets"):
-        super().__init__(mode, (28, 28, 1), load_on_ram, download, tmp_dir, download_dataset_omniglot)
+        super().__init__(mode, (28, 28, 1), load_on_ram, download, tmp_dir,"omniglot", download_dataset_omniglot)

@@ -7,7 +7,7 @@ from PIL import Image
 
 
 class AbstractDataset:
-    def __init__(self, mode='train', data_shape=(84, 84, 3), load_on_ram=True, download=True, tmp_dir="datasets", download_function = None):
+    def __init__(self, mode='train', data_shape=(84, 84, 3), load_on_ram=True, download=True, tmp_dir="datasets", dataset_name="dataset_YYY", download_function = None):
         assert mode in ['train', 'val', 'test'], "given mode should be train, val or test."
         self.IMAGE_SIZE = (data_shape[0], data_shape[1])
         self.IMAGE_CHANNELS = data_shape[2]
@@ -16,7 +16,7 @@ class AbstractDataset:
         dataset_exists = False
         if not os.path.exists(base_dts):
             os.mkdir(base_dts)
-        self.dts_dir = os.path.join(base_dts, "omniglot")
+        self.dts_dir = os.path.join(base_dts, dataset_name)
         if not os.path.exists(self.dts_dir):
             os.mkdir(self.dts_dir)
 

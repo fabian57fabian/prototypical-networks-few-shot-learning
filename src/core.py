@@ -11,6 +11,7 @@ from src.prototypical_net import PrototypicalNetwork
 from src.prototypical_loss import prototypical_loss
 from src.data.MiniImagenetDataset import MiniImagenetDataset
 from src.data.OmniglotDataset import OmniglotDataset
+from src.data.Flowers102Dataset import Flowers102Dataset
 
 # example train algo from https://github.com/pytorch/examples/blob/main/mnist/main.py
 # Loading datasets from https://github.com/learnables/learn2learn/tree/master#learning-domains
@@ -27,6 +28,11 @@ def build_dataloaders(dataset='mini_imagenet'):
         train_loader = OmniglotDataset(mode='train', load_on_ram=True, download=True, tmp_dir="datasets")
         valid_loader = OmniglotDataset(mode='val', load_on_ram=True, download=False, tmp_dir="datasets")
         test_loader = OmniglotDataset(mode='test', load_on_ram=True, download=False, tmp_dir="datasets")
+        return train_loader, valid_loader, test_loader
+    elif dataset == 'flowers102':
+        train_loader = Flowers102Dataset(mode='train', load_on_ram=True, download=True, tmp_dir="datasets")
+        valid_loader = Flowers102Dataset(mode='val', load_on_ram=True, download=False, tmp_dir="datasets")
+        test_loader = Flowers102Dataset(mode='test', load_on_ram=True, download=False, tmp_dir="datasets")
         return train_loader, valid_loader, test_loader
     assert False, "dataset unknown"
 

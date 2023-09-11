@@ -2,13 +2,14 @@ import os
 import shutil
 
 from unittest import TestCase
-from src.data.OmniglotDataset import OmniglotDataset
+from src.data.Flowers102Dataset import Flowers102Dataset
 
-class OmniglotDataset(TestCase):
+class TestFlowers102Dataset(TestCase):
+
     def test_constructor_download(self):
-        _dts_dir = "datasets_og"
+        _dts_dir = "datasets_fl"
         if os.path.exists(_dts_dir): shutil.rmtree(_dts_dir)
-        dl = OmniglotDataset(load_on_ram=False, download=True, tmp_dir=_dts_dir)
+        dl = Flowers102Dataset(load_on_ram=False, download=True, tmp_dir=_dts_dir, seed=647473)
         assert os.path.exists(dl.dts_dir)
         assert len(os.listdir(dl.dts_dir)) == 3
         for d in ["test", "val", "train"]:
