@@ -142,17 +142,18 @@ def train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
 
         # Val
         model.eval()
-        for i in tqdm(range(episodes_per_epoch), total=episodes_per_epoch):
-            batch = valid_loader.GetSample(test_num_class, number_support, train_num_query)
-            x, y = batch
-            x = x.to(device)
-            y = y.to(device)
-            x = model(x)
-            loss, acc = prototypical_loss(x, y, number_support, test_num_class)
-            val_loss.append(loss.item())
-            val_acc.append(acc.item())
-        avg_loss = np.mean(val_loss[-episodes_per_epoch:])
-        avg_acc = np.mean(val_acc[-episodes_per_epoch:])
+        with torch.no_grad():
+            for i in tqdm(range(episodes_per_epoch), total=episodes_per_epoch):
+                batch = valid_loader.GetSample(test_num_class, number_support, train_num_query)
+                x, y = batch
+                x = x.to(device)
+                y = y.to(device)
+                x = model(x)
+                loss, acc = prototypical_loss(x, y, number_support, test_num_class)
+                val_loss.append(loss.item())
+                val_acc.append(acc.item())
+            avg_loss = np.mean(val_loss[-episodes_per_epoch:])
+            avg_acc = np.mean(val_acc[-episodes_per_epoch:])
         writer.add_scalar("Loss/val", avg_loss, epoch)
         writer.add_scalar("Acc/val", avg_acc, epoch)
         print(f"Avg Val Loss: {avg_loss}, Avg Val Acc: {avg_acc}")
