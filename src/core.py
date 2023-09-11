@@ -96,11 +96,11 @@ def train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
             optimizer.step()
             train_loss.append(loss.item())
             train_acc.append(acc.item())
-            writer.add_scalar("Loss/train", train_loss[-1], epoch)
-            writer.add_scalar("Acc/train", train_acc[-1], epoch)
         if epoch % save_each == 0:
             save_model(model, training_dir, f"model_{epoch}.pt")
         loss_mean, acc_mean = np.mean(train_loss[-episodes_per_epoch:]),np.mean(train_acc[-episodes_per_epoch:])
+        writer.add_scalar("Loss/train", loss_mean, epoch)
+        writer.add_scalar("Acc/train", acc_mean, epoch)
         print(f'Ep {epoch}: Avg Train loss: {loss_mean}, Avg Train acc: {acc_mean}')
         lr_scheduler.step()
 
@@ -115,10 +115,10 @@ def train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
             loss, acc = prototypical_loss(x, y, number_support, test_num_class)
             val_loss.append(loss.item())
             val_acc.append(acc.item())
-            writer.add_scalar("Loss/val", val_loss[-1], epoch)
-            writer.add_scalar("Acc/val", val_acc[-1], epoch)
         avg_loss = np.mean(val_loss[-episodes_per_epoch:])
         avg_acc = np.mean(val_acc[-episodes_per_epoch:])
+        writer.add_scalar("Loss/val", avg_loss, epoch)
+        writer.add_scalar("Acc/val", avg_acc, epoch)
         print(f"Avg Val Loss: {avg_loss}, Avg Val Acc: {avg_acc}")
         if avg_acc > best_acc:
             save_model(model, training_dir, f"model_best.pt")
