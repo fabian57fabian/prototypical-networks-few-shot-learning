@@ -1,8 +1,6 @@
 import os
 
-import learn2learn.vision.models
 import torch
-from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 
 import numpy as np
@@ -11,7 +9,8 @@ from tqdm import tqdm
 
 from src.prototypical_net import PrototypicalNetwork
 from src.prototypical_loss import prototypical_loss
-from src.MiniImagenetDataset import MiniImagenetDataset
+from src.data.MiniImagenetDataset import MiniImagenetDataset
+from src.data.OmniglotDataset import OmniglotDataset
 
 # example train algo from https://github.com/pytorch/examples/blob/main/mnist/main.py
 # Loading datasets from https://github.com/learnables/learn2learn/tree/master#learning-domains
@@ -20,9 +19,14 @@ from src.MiniImagenetDataset import MiniImagenetDataset
 def build_dataloaders(dataset='mini_imagenet'):
     if dataset == 'mini_imagenet':
         # Loading datasets
-        train_loader = MiniImagenetDataset(mode='train', batch_size=16, load_on_ram=True, download=True, tmp_dir="datasets")
-        valid_loader = MiniImagenetDataset(mode='val', batch_size=16, load_on_ram=True, download=False, tmp_dir="datasets")
-        test_loader = MiniImagenetDataset(mode='test', batch_size=16, load_on_ram=True, download=False, tmp_dir="datasets")
+        train_loader = MiniImagenetDataset(mode='train', load_on_ram=True, download=True, tmp_dir="datasets")
+        valid_loader = MiniImagenetDataset(mode='val', load_on_ram=True, download=False, tmp_dir="datasets")
+        test_loader = MiniImagenetDataset(mode='test', load_on_ram=True, download=False, tmp_dir="datasets")
+        return train_loader, valid_loader, test_loader
+    elif dataset == 'omniglot':
+        train_loader = OmniglotDataset(mode='train', load_on_ram=True, download=True, tmp_dir="datasets")
+        valid_loader = OmniglotDataset(mode='val', load_on_ram=True, download=False, tmp_dir="datasets")
+        test_loader = OmniglotDataset(mode='test', load_on_ram=True, download=False, tmp_dir="datasets")
         return train_loader, valid_loader, test_loader
     assert False, "dataset unknown"
 

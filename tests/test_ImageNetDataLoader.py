@@ -3,28 +3,28 @@ import shutil
 from datetime import datetime
 
 from unittest import TestCase
-from src.MiniImagenetDataset import MiniImagenetDataset, download_dataset
+from src.data.MiniImagenetDataset import MiniImagenetDataset, download_dataset
 
 
 class TestMiniImagenetDataset(TestCase):
     def test_constructor_download(self):
         _dts_dir = "datasets"
         if os.path.exists(_dts_dir): shutil.rmtree(_dts_dir)
-        dl = MiniImagenetDataset(batch_size=16, load_on_ram=False, download=True)
+        dl = MiniImagenetDataset(load_on_ram=False, download=True)
         assert os.path.exists(dl.dts_dir)
         assert len(os.listdir(dl.dts_dir)) == 3
 
     def test_constructor_onram(self):
         _dts_dir = "datasets_ram"
         if os.path.exists(_dts_dir): shutil.rmtree(_dts_dir)
-        dl = MiniImagenetDataset(batch_size=16, load_on_ram=True, download=True, tmp_dir=_dts_dir)
+        dl = MiniImagenetDataset(load_on_ram=True, download=True, tmp_dir=_dts_dir)
         assert os.path.exists(dl.dts_dir)
         assert len(os.listdir(dl.dts_dir)) == 3
 
     def test_getsample(self):
         _dts_dir = "datasets_sample"
         if os.path.exists(_dts_dir): shutil.rmtree(_dts_dir)
-        dl = MiniImagenetDataset(batch_size=16, load_on_ram=True, download=True, tmp_dir=_dts_dir)
+        dl = MiniImagenetDataset(load_on_ram=True, download=True, tmp_dir=_dts_dir)
         NC, NS, NQ = 20, 5, 6
         start_time = datetime.now()
         sample = dl.GetSample(NC, NS, NQ)

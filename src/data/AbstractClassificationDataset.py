@@ -1,40 +1,22 @@
 import os
 import random
 
-import numpy as np
 import torch
 import torchvision.transforms as transforms
 from PIL import Image
 
-def download_dataset(dest_dir):
-    url = "https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/releases/download/v0.1/mini_imagenet.zip"
-    if not os.path.exists(dest_dir):
-        os.mkdir(dest_dir)
-    os.system(f'wget -q "{url}" -P {dest_dir}')
-    zip_file = os.path.join(dest_dir,'mini_imagenet.zip')
-    os.system(f"unzip -q {zip_file} -d {dest_dir}")
-    os.remove(zip_file)
-    path_dataset_train = os.path.join(dest_dir, 'train')
-    path_dataset_val = os.path.join(dest_dir, 'val')
-    path_dataset_test = os.path.join(dest_dir, 'test')
-    num_cl_train = len(os.listdir(path_dataset_train))
-    num_cl_val = len(os.listdir(path_dataset_val))
-    num_cl_test = len(os.listdir(path_dataset_test))
-    print(f"Dataset MiniImageNet: {num_cl_train} train, {num_cl_val} val, {num_cl_test} test")
 
-
-
-class MiniImagenetDataset:
-    IMAGE_SIZE = (84, 84)
-    def __init__(self, mode='train', batch_size=16, load_on_ram=True, download=True, tmp_dir="datasets"):
+class AbstractDataset:
+    def __init__(self, mode='train', data_shape=(84, 84, 3), load_on_ram=True, download=True, tmp_dir="datasets", download_function = None):
         assert mode in ['train', 'val', 'test'], "given mode should be train, val or test."
-        self.batch_size = batch_size
+        self.IMAGE_SIZE = (data_shape[0], data_shape[1])
+        self.IMAGE_CHANNELS = data_shape[2]
         self.load_on_ram = load_on_ram
         base_dts = tmp_dir
         dataset_exists = False
         if not os.path.exists(base_dts):
             os.mkdir(base_dts)
-        self.dts_dir = os.path.join(base_dts, "mini_imagenet")
+        self.dts_dir = os.path.join(base_dts, "omniglot")
         if not os.path.exists(self.dts_dir):
             os.mkdir(self.dts_dir)
 
@@ -45,7 +27,7 @@ class MiniImagenetDataset:
                 dataset_exists = True
         if download and not dataset_exists:
             print("Downloading dataset")
-            download_dataset(self.dts_dir)
+            download_function(self.dts_dir)
         self.classes = os.listdir(self.curr_dataset_folder)
         self.cache = None
         if self.load_on_ram:
