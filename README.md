@@ -79,7 +79,7 @@ All of these uses **epochs=200** and **iterations_per_epoch=100**.
 | Dataset       | Paper res<br><sup>(Acc) | Our res<br><sup>(Acc)                                                                                                  | Images<br><sup>(shape) | Prototype<br><sup>(shape) | Duration     |
 |---------------|-------------------------|------------------------------------------------------------------------------------------------------------------------|------------------------|---------------------------|--------------|
 | mini_imagenet | 68.20                   | [65.24](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/results/mini_imagenet/train_5way.png) | (84, 84, 3)            | (batch, 1600)             | cpu / 13h20m |
-| omniglot      | 98.80                   | [98.26](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/results/omniglot/train_5way.png)      | (28, 28, 1)            | (batch, 60)               | cpu / 2h35m  |
+| omniglot      | 98.80                   | [98.57](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/results/omniglot/train_5way.png)      | (28, 28, 1)            | (batch, 60)               | cpu / 2h35m  |
 | flowers102    | /                       | [73.81](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/results/flowers102/training_.png)     | (64, 64, 3)            | (batch, TODO)             | cpu / 5h48m  |
 
 </details>
