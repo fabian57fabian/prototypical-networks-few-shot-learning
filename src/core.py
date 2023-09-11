@@ -4,7 +4,7 @@ import torch
 from torch.utils.tensorboard import SummaryWriter
 
 import numpy as np
-
+import yaml
 from tqdm import tqdm
 
 from src.prototypical_net import PrototypicalNetwork
@@ -41,6 +41,11 @@ def build_device(use_gpu=False):
     return device
 
 
+def save_yaml_config(training_dir, config):
+    with open(os.path.join(training_dir, "config.yaml"), 'w') as file:
+        file.write(yaml.dump(config))
+
+
 def init_savemodel() -> str:
     main_dir = "runs"
     if not os.path.exists(main_dir): os.mkdir(main_dir)
@@ -64,6 +69,8 @@ def train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
           train_num_query=15,
           number_support=5,
           episodes_per_epoch=50,
+          optim_step_size=20,
+          optim_gamma = 0.5,
           save_each=5):
     training_dir = init_savemodel()
     print(f"Writing to {training_dir}")
@@ -76,7 +83,24 @@ def train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
     #print(model)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-    lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.5)
+    lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=optim_step_size, gamma=optim_gamma)
+
+    # Save config
+    config = {
+        "dataset": dataset,
+        "epochs": epochs,
+        "gpu": use_gpu,
+        "adam_lr": lr,
+        "NC_train": train_num_classes,
+        "NQ_train": train_num_query,
+        "NC_valid": test_num_class,
+        "NS": number_support,
+        "ep_per_epoch": episodes_per_epoch,
+        "opt_step_size": optim_step_size,
+        "opt_gamma": optim_gamma,
+        "save_each": save_each
+    }
+    save_yaml_config(training_dir, config)
 
     train_loss = []
     train_acc = []
