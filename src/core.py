@@ -9,7 +9,7 @@ import yaml
 from tqdm import tqdm
 
 from src.prototypical_net import PrototypicalNetwork
-from src.prototypical_loss import prototypical_loss
+from src.prototypical_loss import prototypical_loss, euclidean_dist, cosine_dist
 from src.data.MiniImagenetDataset import MiniImagenetDataset
 from src.data.OmniglotDataset import OmniglotDataset
 from src.data.Flowers102Dataset import Flowers102Dataset
@@ -48,6 +48,14 @@ def build_device(use_gpu=False):
     return device
 
 
+def build_distance_function(distance_function: str):
+    assert distance_function in ["eucldean", "cosine"]
+    if distance_function == "euclidean":
+        return euclidean_dist
+    elif distance_function == "cosine":
+        return cosine_dist
+    assert False, "Wrong distance function supplied"
+
 def save_yaml_config(training_dir, config):
     with open(os.path.join(training_dir, "config.yaml"), 'w') as file:
         file.write(yaml.dump(config))
@@ -78,6 +86,7 @@ def train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
           episodes_per_epoch=50,
           optim_step_size=20,
           optim_gamma = 0.5,
+          distance_function="euclidean",
           save_each=5):
     training_dir = init_savemodel()
     print(f"Writing to {training_dir}")
@@ -92,6 +101,8 @@ def train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=optim_step_size, gamma=optim_gamma)
 
+    distance_fn = build_distance_function(distance_function)
+
     # Save config
     config = {
         "dataset": dataset,
@@ -105,6 +116,7 @@ def train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
         "ep_per_epoch": episodes_per_epoch,
         "opt_step_size": optim_step_size,
         "opt_gamma": optim_gamma,
+        "distance_function": distance_function,
         "save_each": save_each
     }
     save_yaml_config(training_dir, config)
@@ -127,7 +139,7 @@ def train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
             x = x.to(device)
             y = y.to(device)
             x = model(x)
-            loss, acc = prototypical_loss(x, y, number_support, train_num_classes)
+            loss, acc = prototypical_loss(x, y, number_support, train_num_classes, distance_fn)
             loss.backward()
             optimizer.step()
             train_loss.append(loss.item())
@@ -149,7 +161,7 @@ def train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
                 x = x.to(device)
                 y = y.to(device)
                 x = model(x)
-                loss, acc = prototypical_loss(x, y, number_support, test_num_class)
+                loss, acc = prototypical_loss(x, y, number_support, test_num_class, distance_fn)
                 val_loss.append(loss.item())
                 val_acc.append(acc.item())
             avg_loss = np.mean(val_loss[-episodes_per_epoch:])

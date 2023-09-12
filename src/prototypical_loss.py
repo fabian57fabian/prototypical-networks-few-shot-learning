@@ -23,7 +23,25 @@ def euclidean_dist(x, y):
     return torch.pow(x - y, 2).sum(2)
 
 
-def prototypical_loss(out: torch.tensor, target: torch.tensor, n_support: int, n_classes: int):
+def cosine_dist(x1, x2):
+    norm1 = x1.norm(p=2)
+    norm2 = x2.norm(p=2)
+    return 1 - torch.dot(x1, x2) / (norm1 * norm2)
+
+
+def get_support_query_indexes(n_support, n_classes, n_query):
+    # Calculate indexes, extract prototypes and query sample
+    indexes_support = []
+    indexes_query = []
+    for i in range(n_classes):
+        start = i * (n_support + n_query)
+        stop = (i + 1) * (n_support + n_query)
+        indexes_support.append(list(range(start, start + n_support, 1)))
+        indexes_query += list(range(start + n_support, stop, 1))
+    return indexes_support, indexes_query
+
+
+def prototypical_loss(out: torch.tensor, target: torch.tensor, n_support: int, n_classes: int, distance_fn=euclidean_dist):
     '''
     Compute the barycentres by averaging the features of n_support samples
     '''
@@ -38,19 +56,13 @@ def prototypical_loss(out: torch.tensor, target: torch.tensor, n_support: int, n
     batch_size = out_cpu.shape[0]
     n_query = int( (batch_size - (n_classes * n_support)) / n_classes )
 
-    # Calculate indexes, extract prototypes and query sample
-    indexes_support = []
-    indexes_query = []
-    for i in range(n_classes):
-        start = i * (n_support + n_query)
-        stop = (i + 1) * (n_support + n_query)
-        indexes_support.append(list(range(start, start + n_support, 1)))
-        indexes_query += list(range(start + n_support, stop, 1))
+    indexes_support, indexes_query = get_support_query_indexes(n_support, n_classes, n_query)
+
     prototypes = torch.stack([out_cpu[idx_list].mean(0) for idx_list in indexes_support])
     query_samples = out_cpu[indexes_query]
 
     # Calculate the pairwise Euclidean distances between the query samples and the prototypes
-    dists = euclidean_dist(query_samples, prototypes)
+    dists = distance_fn(query_samples, prototypes)
     logits = -dists
 
     # Apply log(softmax(logits)) to find the log-probability
