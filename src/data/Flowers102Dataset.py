@@ -54,6 +54,7 @@ def download_dataset_flowers102(dest_dir):
 
 
 class Flowers102Dataset(AbstractDataset):
-    def __init__(self, mode='train', load_on_ram=True, download=True, tmp_dir="datasets", seed=3840):
+    def __init__(self, mode='train', load_on_ram=True, download=True,images_size=None, tmp_dir="datasets", seed=3840):
         if seed >= 0: random.seed(seed)
-        super().__init__(mode, (64, 64, 3), load_on_ram, download, tmp_dir,"flowers102", download_dataset_flowers102)
+        images_size = 64 if images_size is None else images_size
+        super().__init__(mode, (images_size, images_size, 3), load_on_ram, download, tmp_dir,"flowers102", download_dataset_flowers102)

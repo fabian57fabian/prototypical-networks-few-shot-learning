@@ -18,25 +18,25 @@ from src.data.Flowers102Dataset import Flowers102Dataset
 # Loading datasets from https://github.com/learnables/learn2learn/tree/master#learning-domains
 
 
-def build_dataloaders(dataset='mini_imagenet', only_test=False):
+def build_dataloaders(dataset='mini_imagenet', size=None, only_test=False):
     if dataset == 'mini_imagenet':
         # Loading datasets
-        test_loader = MiniImagenetDataset(mode='test', load_on_ram=True, download=True, tmp_dir="datasets")
+        test_loader = MiniImagenetDataset(mode='test', load_on_ram=True, download=True, images_size=size, tmp_dir="datasets")
         if only_test: return None, None, test_loader
-        train_loader = MiniImagenetDataset(mode='train', load_on_ram=True, download=False, tmp_dir="datasets")
-        valid_loader = MiniImagenetDataset(mode='val', load_on_ram=True, download=False, tmp_dir="datasets")
+        train_loader = MiniImagenetDataset(mode='train', load_on_ram=True, download=False, images_size=size, tmp_dir="datasets")
+        valid_loader = MiniImagenetDataset(mode='val', load_on_ram=True, download=False, images_size=size, tmp_dir="datasets")
         return train_loader, valid_loader, test_loader
     elif dataset == 'omniglot':
-        test_loader = OmniglotDataset(mode='test', load_on_ram=True, download=True, tmp_dir="datasets")
+        test_loader = OmniglotDataset(mode='test', load_on_ram=True, download=True, images_size=size, tmp_dir="datasets")
         if only_test: return None, None, test_loader
-        train_loader = OmniglotDataset(mode='train', load_on_ram=True, download=False, tmp_dir="datasets")
-        valid_loader = OmniglotDataset(mode='val', load_on_ram=True, download=False, tmp_dir="datasets")
+        train_loader = OmniglotDataset(mode='train', load_on_ram=True, download=False, images_size=size, tmp_dir="datasets")
+        valid_loader = OmniglotDataset(mode='val', load_on_ram=True, download=False, images_size=size, tmp_dir="datasets")
         return train_loader, valid_loader, test_loader
     elif dataset == 'flowers102':
-        test_loader = Flowers102Dataset(mode='test', load_on_ram=True, download=True, tmp_dir="datasets")
+        test_loader = Flowers102Dataset(mode='test', load_on_ram=True, download=True, images_size=size, tmp_dir="datasets")
         if only_test: return None, None, test_loader
-        train_loader = Flowers102Dataset(mode='train', load_on_ram=True, download=False, tmp_dir="datasets")
-        valid_loader = Flowers102Dataset(mode='val', load_on_ram=True, download=False, tmp_dir="datasets")
+        train_loader = Flowers102Dataset(mode='train', load_on_ram=True, download=False, images_size=size, tmp_dir="datasets")
+        valid_loader = Flowers102Dataset(mode='val', load_on_ram=True, download=False, images_size=size, tmp_dir="datasets")
         return train_loader, valid_loader, test_loader
     assert False, "dataset unknown"
 
@@ -92,12 +92,13 @@ def train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
           optim_step_size=20,
           optim_gamma = 0.5,
           distance_function="euclidean",
+          images_size=None,
           save_each=5,
           eval_each=1):
     training_dir = init_savemodel()
     print(f"Writing to {training_dir}")
     writer = SummaryWriter(log_dir=training_dir)
-    loaders = build_dataloaders(dataset)
+    loaders = build_dataloaders(dataset, images_size)
     train_loader, valid_loader, test_loader = loaders
     device = build_device(use_gpu)
     print(f"Creating Prototype model on {device}")
@@ -192,8 +193,9 @@ def test(model_path, episodes_per_epoch=100, dataset='mini_imagenet', use_gpu=Fa
          test_num_query=15,
           test_num_class=5,
           number_support=5,
-          distance_function="euclidean"):
-    _, _, test_loader = build_dataloaders(dataset, only_test=True)
+          distance_function="euclidean",
+          images_size=None):
+    _, _, test_loader = build_dataloaders(dataset, images_size, only_test=True)
     device = build_device(use_gpu)
     print(f"Creating Prototype model on {device} from {model_path}")
     model = PrototypicalNetwork().to(device)
