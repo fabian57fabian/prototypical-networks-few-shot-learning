@@ -38,6 +38,7 @@ def prototypical_loss(out: torch.tensor, target: torch.tensor, n_support: int, n
     batch_size = out_cpu.shape[0]
     n_query = int( (batch_size - (n_classes * n_support)) / n_classes )
 
+    # Calculate indexes, extract prototypes and query sample
     indexes_support = []
     indexes_query = []
     for i in range(n_classes):
@@ -45,23 +46,26 @@ def prototypical_loss(out: torch.tensor, target: torch.tensor, n_support: int, n
         stop = (i + 1) * (n_support + n_query)
         indexes_support.append(list(range(start, start + n_support, 1)))
         indexes_query += list(range(start + n_support, stop, 1))
-
-    #indexes_support = torch.tensor(indexes_support)
     prototypes = torch.stack([out_cpu[idx_list].mean(0) for idx_list in indexes_support])
+    query_samples = out_cpu[indexes_query]
 
-    #indexes_query = torch.tensor(indexes_query)
-    query_samples = out_cpu[indexes_query]# torch.stack([out_cpu[idx_list] for idx_list in indexes_query])
-
+    # Calculate the pairwise Euclidean distances between the query samples and the prototypes
     dists = euclidean_dist(query_samples, prototypes)
+    logits = -dists
 
-    log_p_y = F.log_softmax(-dists, dim=1).view(n_classes, n_query, -1)
+    # Apply log(softmax(logits)) to find the log-probability
+    log_p_y = F.log_softmax(logits, dim=1).view(n_classes, n_query, -1)
 
-    target_inds = torch.arange(0, n_classes)
-    target_inds = target_inds.view(n_classes, 1, 1)
+    # Create target indexes matching expected class labels for query samples
+    target_inds = torch.arange(0, n_classes).view(n_classes, 1, 1)
     target_inds = target_inds.expand(n_classes, n_query, 1).long()
 
-    loss_val = -log_p_y.gather(2, target_inds).squeeze().view(-1).mean()
+    # calculate loss by extracting log-softmax values corresponding to correct classes
+    log_p_y_correct = -log_p_y.gather(2, target_inds).squeeze().view(-1)
+    loss_val = log_p_y_correct.mean()
+    # Calculate accuracy by comparing predicted classes to true classes
     _, y_hat = log_p_y.max(2)
-    acc_val = y_hat.eq(target_inds.squeeze(2)).float().mean()
+    correct = y_hat.eq(target_inds.squeeze(2)).float()
+    acc_val = correct.mean()
 
     return loss_val,  acc_val
