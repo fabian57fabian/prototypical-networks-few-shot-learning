@@ -87,9 +87,9 @@ Then evaluation is performed in different n-ways and k-shots.
 
 And more info below:
 
-| Dataset | Images<br><sup>(shape) | Prototype<br><sup>(shape) | Duration     |
-|---------|--|--|--|
-| mini_imagenet | (84, 84, 3)            | (batch, 1600)             | cpu / 13h20m |
-| omniglot |(28, 28, 1)            | (batch, 60)               | gpu / 1h12m  |
-| flowers102 |(64, 64, 3)            | (batch, 1024)             | gpu / 58m    |
+| Dataset | Images<br><sup>(shape) | Embeddings<br><sup>(shape) | Duration     |
+|---------|--|----------------------------|--|
+| mini_imagenet | (84, 84, 3)            | (batch, 1600)              | cpu / 13h20m |
+| omniglot |(28, 28, 1)            | (batch, 60)                | gpu / 1h12m  |
+| flowers102 |(64, 64, 3)            | (batch, 1024)              | gpu / 58m    |
 </details>
