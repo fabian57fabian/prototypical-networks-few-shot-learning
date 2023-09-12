@@ -186,7 +186,7 @@ def train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
     writer.close()
     duration = (datetime.datetime.now() - start_time)
     print(f"Training duration: {str(duration)}")
-    print(f"Best val/acc {best_acc:.2f} on epoch {best_acc_ep}")
+    print(f"Best val/acc {best_acc*100:.2f} on epoch {best_acc_ep}")
 
 def test(model_path, episodes_per_epoch=100, dataset='mini_imagenet', use_gpu=False,
          test_num_query=15,
