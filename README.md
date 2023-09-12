@@ -55,6 +55,7 @@ To replicate the results, launch this training:
 ```bash
 python train.py --dataset mini_imagenet \
                 --epochs 200 \
+                --gpu \
                 --train-num-class 30 \
                 --test-num-class 5 \
                 --number-support 5 \
@@ -63,6 +64,7 @@ python train.py --dataset mini_imagenet \
                 --adam-lr 0.001 \
                 --opt-step-size 20 \
                 --opt-gamma 0.5 \
+                --distance-function "euclidean" \
                 --save-each 5
 ```
 
