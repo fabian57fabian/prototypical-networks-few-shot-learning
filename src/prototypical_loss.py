@@ -24,9 +24,7 @@ def euclidean_dist(x, y):
 
 
 def cosine_dist(x1, x2):
-    norm1 = x1.norm(p=2)
-    norm2 = x2.norm(p=2)
-    return 1 - torch.dot(x1, x2) / (norm1 * norm2)
+    return torch.nn.functional.cosine_similarity(x1, x2, dim=1)
 
 
 def get_support_query_indexes(n_support, n_classes, n_query):
