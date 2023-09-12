@@ -75,6 +75,16 @@ Implemented datasets are [omniglot, mini_imagenet, flowers102]:
 <details open>
 <summary>Experiments</summary>
 
+### Training datasets info
+
+| Dataset | Images<br><sup>(shape) | Embeddings<br><sup>(shape) | Duration     |
+|---------|------------------------|----------------------------|--|
+| mini_imagenet | (84, 84, 3)            | (batch, 1600)              | cpu / 13h20m |
+| omniglot | (28, 28, 1)            | (batch, 60)                | gpu / 1h12m  |
+| flowers102 | (74, 74, 3)            | (batch, 1024)              | gpu / 58m    |
+
+### 1-shot vs few-shot
+
 Lots of experiments were done using basic paper's data by replicating the training.
 All of these uses **nway=30**, **epochs=200** and **iterations_per_epoch=100** for training.
 Then evaluation is performed in different n-ways and k-shots.
@@ -85,11 +95,16 @@ Then evaluation is performed in different n-ways and k-shots.
 | omniglot      | 98.80                                   | [97.77](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/results/omniglot/train_5shot.png)          | 98.8                                    | [91.93](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/results/omniglot/train_1shot.png)      | 
 | flowers102    | /                                       | [83.40](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/results/flowers102/train_5shot_size74.png) | /                                       | [51.90](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/results/flowers102/train_1shot.png)    | 
 
-And more info below:
+### Euclidean vs cosine distances
 
-| Dataset | Images<br><sup>(shape) | Embeddings<br><sup>(shape) | Duration     |
-|---------|------------------------|----------------------------|--|
-| mini_imagenet | (84, 84, 3)            | (batch, 1600)              | cpu / 13h20m |
-| omniglot | (28, 28, 1)            | (batch, 60)                | gpu / 1h12m  |
-| flowers102 | (74, 74, 3)            | (batch, 1024)              | gpu / 58m    |
+Cosine experiments were done on 5-way 5-shot configurations.
+Same results for similar 1-shot and 20-way trainings.
+
+| Dataset | Cosine<br><sup>(acc) | Euclidean<br><sup>(acc) |
+|---------|----------------------|-------------------------|
+| mini_imagenet | TODO                 | TODO                       |
+| omniglot | TODO                 | TODO                      |
+| flowers102 | TODO                 | TODO                       |
+
+
 </details>
