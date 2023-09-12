@@ -79,17 +79,17 @@ Lots of experiments were done using basic paper's data by replicating the traini
 All of these uses **nway=30**, **epochs=200** and **iterations_per_epoch=100** for training.
 Then evaluation is performed in different n-ways and k-shots.
 
-| Dataset       | Paper res<br>5-way 5-shot<br><sup>(Acc) | Our res<br>5-way 5-shot<br><sup>(Acc)                                                                                   | Paper res<br>5-way 1-shot<br><sup>(Acc) | Our res<br>5-way 1-shot<br><sup>(Acc)                                                                                   |
-|---------------|-----------------------------------------|-------------------------------------------------------------------------------------------------------------------------|-----------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
-| mini_imagenet | 68.20                                   | [63.62](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/results/mini_imagenet/train_5shot.png) | 49.42                                   | [46.13](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/results/mini_imagenet/train_1shot.png) |
-| omniglot      | 98.80                                   | [97.77](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/results/omniglot/train_5shot.png)      | 98.8                                    | [91.93](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/results/omniglot/train_1shot.png)      | 
-| flowers102    | /                                       | [76.77](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/results/flowers102/train_5shot.png)    | /                                       | [TODO](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/results/flowers102/train_1shot.png)     | 
+| Dataset       | Paper res<br>5-way 5-shot<br><sup>(Acc) | Our res<br>5-way 5-shot<br><sup>(Acc)                                                                                       | Paper res<br>5-way 1-shot<br><sup>(Acc) | Our res<br>5-way 1-shot<br><sup>(Acc)                                                                                   |
+|---------------|-----------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|-----------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
+| mini_imagenet | 68.20                                   | [63.62](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/results/mini_imagenet/train_5shot.png)     | 49.42                                   | [46.13](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/results/mini_imagenet/train_1shot.png) |
+| omniglot      | 98.80                                   | [97.77](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/results/omniglot/train_5shot.png)          | 98.8                                    | [91.93](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/results/omniglot/train_1shot.png)      | 
+| flowers102    | /                                       | [83.40](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/results/flowers102/train_5shot_size74.png) | /                                       | [51.90](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/results/flowers102/train_1shot.png)    | 
 
 And more info below:
 
 | Dataset | Images<br><sup>(shape) | Embeddings<br><sup>(shape) | Duration     |
-|---------|--|----------------------------|--|
+|---------|------------------------|----------------------------|--|
 | mini_imagenet | (84, 84, 3)            | (batch, 1600)              | cpu / 13h20m |
-| omniglot |(28, 28, 1)            | (batch, 60)                | gpu / 1h12m  |
-| flowers102 |(64, 64, 3)            | (batch, 1024)              | gpu / 58m    |
+| omniglot | (28, 28, 1)            | (batch, 60)                | gpu / 1h12m  |
+| flowers102 | (74, 74, 3)            | (batch, 1024)              | gpu / 58m    |
 </details>
