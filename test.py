@@ -16,4 +16,4 @@ if __name__ == '__main__':
 
     test(args.model, args.episodes_per_epoch, args.dataset, args.gpu,
          args.test_num_query, args.test_num_class, args.number_support,
-         args.image_size, args.distance_function)
+         args.distance_function, args.image_size)
