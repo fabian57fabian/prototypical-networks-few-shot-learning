@@ -14,10 +14,11 @@ if __name__ == '__main__':
     parser.add_argument('--adam-lr', type=float, default=0.001, help='Base learning rate for Adam.')
     parser.add_argument('--opt-step-size', type=int, default=20, help='Optimization scheduler step size (defualt 20)')
     parser.add_argument('--opt-gamma', type=float, default=0.5, help='Optimization scheduler gamma (defualt 0.5)')
-    parser.add_argument('--distance-function', type=str, default="euclidean", choices=["eucldean", "cosine"], help='Distance function.')
+    parser.add_argument('--distance-function', type=str, default="euclidean", choices=["euclidean", "cosine"], help='Distance function.')
     parser.add_argument('--save-each', type=int, default=5, help='Save model each N epochs, default 5')
+    parser.add_argument('--eval-each', type=int, default=1, help='Evaluate each X epochs, default 1.')
     args = parser.parse_args()
 
     train(args.dataset, args.epochs, args.gpu, args.adam_lr,
           args.train_num_class, args.val_num_class, args.train_num_query, args.number_support,
-          args.episodes_per_epoch, args.opt_step_size, args.opt_gamma, args.distance_function, args.save_each)
+          args.episodes_per_epoch, args.opt_step_size, args.opt_gamma, args.distance_function, args.save_each, args.eval_each)

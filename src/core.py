@@ -92,7 +92,8 @@ def train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
           optim_step_size=20,
           optim_gamma = 0.5,
           distance_function="euclidean",
-          save_each=5):
+          save_each=5,
+          eval_each=1):
     training_dir = init_savemodel()
     print(f"Writing to {training_dir}")
     writer = SummaryWriter(log_dir=training_dir)
@@ -159,26 +160,27 @@ def train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
         lr_scheduler.step()
 
         # Val
-        model.eval()
-        with torch.no_grad():
-            for i in tqdm(range(episodes_per_epoch), total=episodes_per_epoch):
-                batch = valid_loader.GetSample(test_num_class, number_support, train_num_query)
-                x, y = batch
-                x = x.to(device)
-                y = y.to(device)
-                x = model(x)
-                loss, acc = prototypical_loss(x, y, number_support, test_num_class, distance_fn)
-                val_loss.append(loss.item())
-                val_acc.append(acc.item())
-            avg_loss = np.mean(val_loss[-episodes_per_epoch:])
-            avg_acc = np.mean(val_acc[-episodes_per_epoch:])
-        writer.add_scalar("Loss/val", avg_loss, epoch)
-        writer.add_scalar("Acc/val", avg_acc, epoch)
-        print(f"Avg Val Loss: {avg_loss}, Avg Val Acc: {avg_acc}")
-        if avg_acc > best_acc:
-            save_model(model, training_dir, f"model_best.pt")
-            best_acc = avg_acc
-            best_acc_ep = epoch
+        if eval_each > 0 and epoch % eval_each == 0:
+            model.eval()
+            with torch.no_grad():
+                for i in tqdm(range(episodes_per_epoch), total=episodes_per_epoch):
+                    batch = valid_loader.GetSample(test_num_class, number_support, train_num_query)
+                    x, y = batch
+                    x = x.to(device)
+                    y = y.to(device)
+                    x = model(x)
+                    loss, acc = prototypical_loss(x, y, number_support, test_num_class, distance_fn)
+                    val_loss.append(loss.item())
+                    val_acc.append(acc.item())
+                avg_loss = np.mean(val_loss[-episodes_per_epoch:])
+                avg_acc = np.mean(val_acc[-episodes_per_epoch:])
+            writer.add_scalar("Loss/val", avg_loss, epoch)
+            writer.add_scalar("Acc/val", avg_acc, epoch)
+            print(f"Avg Val Loss: {avg_loss}, Avg Val Acc: {avg_acc}")
+            if avg_acc > best_acc:
+                save_model(model, training_dir, f"model_best.pt")
+                best_acc = avg_acc
+                best_acc_ep = epoch
 
     writer.flush()
     writer.close()
