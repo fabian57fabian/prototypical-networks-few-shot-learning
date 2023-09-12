@@ -131,6 +131,7 @@ def train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
     val_loss = []
     val_acc = []
     best_acc = -1
+    best_acc_ep = -1
     start_time = datetime.datetime.now()
 
     print(f"Startring training at {str(start_time)}")
@@ -176,11 +177,14 @@ def train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
         print(f"Avg Val Loss: {avg_loss}, Avg Val Acc: {avg_acc}")
         if avg_acc > best_acc:
             save_model(model, training_dir, f"model_best.pt")
+            best_acc = avg_acc
+            best_acc_ep = epoch
 
     writer.flush()
     writer.close()
     duration = (datetime.datetime.now() - start_time)
     print(f"Training duration: {str(duration)}")
+    print(f"Best val/acc {best_acc:.2f} on epoch {best_acc_ep}")
 
 def test(model_path, episodes_per_epoch=100, dataset='mini_imagenet', use_gpu=False,
          test_num_query=15,
