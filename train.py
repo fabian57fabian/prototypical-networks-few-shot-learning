@@ -19,5 +19,5 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     train(args.dataset, args.epochs, args.gpu, args.adam_lr,
-          args.train_num_class, args.test_num_class, args.train_num_query, args.number_support,
+          args.train_num_class, args.val_num_class, args.train_num_query, args.number_support,
           args.episodes_per_epoch, args.opt_step_size, args.opt_gamma, args.distance_function, args.save_each)

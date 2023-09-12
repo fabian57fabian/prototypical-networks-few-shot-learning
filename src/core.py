@@ -18,22 +18,25 @@ from src.data.Flowers102Dataset import Flowers102Dataset
 # Loading datasets from https://github.com/learnables/learn2learn/tree/master#learning-domains
 
 
-def build_dataloaders(dataset='mini_imagenet'):
+def build_dataloaders(dataset='mini_imagenet', only_test=False):
     if dataset == 'mini_imagenet':
         # Loading datasets
-        train_loader = MiniImagenetDataset(mode='train', load_on_ram=True, download=True, tmp_dir="datasets")
+        test_loader = MiniImagenetDataset(mode='test', load_on_ram=True, download=True, tmp_dir="datasets")
+        if only_test: return None, None, test_loader
+        train_loader = MiniImagenetDataset(mode='train', load_on_ram=True, download=False, tmp_dir="datasets")
         valid_loader = MiniImagenetDataset(mode='val', load_on_ram=True, download=False, tmp_dir="datasets")
-        test_loader = MiniImagenetDataset(mode='test', load_on_ram=True, download=False, tmp_dir="datasets")
         return train_loader, valid_loader, test_loader
     elif dataset == 'omniglot':
-        train_loader = OmniglotDataset(mode='train', load_on_ram=True, download=True, tmp_dir="datasets")
+        test_loader = OmniglotDataset(mode='test', load_on_ram=True, download=True, tmp_dir="datasets")
+        if only_test: return None, None, test_loader
+        train_loader = OmniglotDataset(mode='train', load_on_ram=True, download=False, tmp_dir="datasets")
         valid_loader = OmniglotDataset(mode='val', load_on_ram=True, download=False, tmp_dir="datasets")
-        test_loader = OmniglotDataset(mode='test', load_on_ram=True, download=False, tmp_dir="datasets")
         return train_loader, valid_loader, test_loader
     elif dataset == 'flowers102':
-        train_loader = Flowers102Dataset(mode='train', load_on_ram=True, download=True, tmp_dir="datasets")
+        test_loader = Flowers102Dataset(mode='test', load_on_ram=True, download=True, tmp_dir="datasets")
+        if only_test: return None, None, test_loader
+        train_loader = Flowers102Dataset(mode='train', load_on_ram=True, download=False, tmp_dir="datasets")
         valid_loader = Flowers102Dataset(mode='val', load_on_ram=True, download=False, tmp_dir="datasets")
-        test_loader = Flowers102Dataset(mode='test', load_on_ram=True, download=False, tmp_dir="datasets")
         return train_loader, valid_loader, test_loader
     assert False, "dataset unknown"
 
@@ -49,7 +52,7 @@ def build_device(use_gpu=False):
 
 
 def build_distance_function(distance_function: str):
-    assert distance_function in ["eucldean", "cosine"]
+    assert distance_function in ["euclidean", "cosine"]
     if distance_function == "euclidean":
         return euclidean_dist
     elif distance_function == "cosine":
@@ -77,6 +80,8 @@ def init_savemodel() -> str:
 def save_model(model, training_dir, name):
     torch.save(model.state_dict(), os.path.join(training_dir, name))
 
+def load_model(path):
+    model = torch.load(path)
 
 def train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
           train_num_classes=30,
@@ -176,4 +181,32 @@ def train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
     writer.close()
     duration = (datetime.datetime.now() - start_time)
     print(f"Training duration: {str(duration)}")
+
+def test(model_path, episodes_per_epoch=100, dataset='mini_imagenet', use_gpu=False,
+         test_num_query=15,
+          test_num_class=5,
+          number_support=5,
+          distance_function="euclidean"):
+    _, _, test_loader = build_dataloaders(dataset, only_test=True)
+    device = build_device(use_gpu)
+    print(f"Creating Prototype model on {device} from {model_path}")
+    model = PrototypicalNetwork().to(device)
+    model.load_state_dict(torch.load(model_path))
+
+    distance_fn = build_distance_function(distance_function)
+
+    val_acc = []
+
+    model.eval()
+    with torch.no_grad():
+        for i in tqdm(range(episodes_per_epoch), total=episodes_per_epoch):
+            batch = test_loader.GetSample(test_num_class, number_support, test_num_query)
+            x, y = batch
+            x = x.to(device)
+            y = y.to(device)
+            x = model(x)
+            _, acc = prototypical_loss(x, y, number_support, test_num_class, distance_fn)
+            val_acc.append(acc.item())
+        avg_acc = np.mean(val_acc[-episodes_per_epoch:])
+    print(f"Avg Test Acc: {avg_acc}")
 
