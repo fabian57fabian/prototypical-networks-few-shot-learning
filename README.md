@@ -102,9 +102,9 @@ Same results for similar 1-shot and 20-way trainings.
 
 | Dataset | Cosine<br><sup>(acc) | Euclidean<br><sup>(acc) |
 |---------|----------------------|-------------------------|
-| mini_imagenet | TODO                 | TODO                       |
-| omniglot | TODO                 | TODO                      |
-| flowers102 | TODO                 | TODO                       |
+| mini_imagenet | TODO                 | 63.62                   |
+| omniglot | 97.77                | 23.48                   |
+| flowers102 | TODO                 | TODO                    |
 
 
 </details>
