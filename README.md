@@ -83,11 +83,11 @@ Implemented datasets are [omniglot, mini_imagenet, flowers102]:
 
 ### Training datasets info
 
-| Dataset | Images<br><sup>(shape) | Embeddings<br><sup>(shape) | Duration     |
-|---------|------------------------|----------------------------|--|
-| mini_imagenet | (84, 84, 3)            | (batch, 1600)              | cpu / 13h20m |
-| omniglot | (28, 28, 1)            | (batch, 60)                | gpu / 1h12m  |
-| flowers102 | (74, 74, 3)            | (batch, 1024)              | gpu / 58m    |
+| Dataset | Images<br><sup>(shape) | Embeddings<br><sup>(shape) | Duration<br><sup>(Colab T4) |
+|---------|------------------------|----------------------------|-----------------------------|
+| mini_imagenet | (84, 84, 3)            | (batch, 1600)              | gpu / 1h43m                 |
+| omniglot | (28, 28, 1)            | (batch, 60)                | gpu / 2h32                  |
+| flowers102 | (74, 74, 3)            | (batch, 1024)              | gpu / 58m                   |
 
 ### 1-shot vs few-shot
 
