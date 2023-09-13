@@ -8,19 +8,25 @@ Create a conda/virtualenv with all necessary packages:
 
 ### Conda
 
-`conda create --name fs-learn --file ./requirements.txt`
+`conda create --name fs-learn`
 
 `conda activate fs-learn`
 
+`conda install pytorch torchvision torchaudio -c pytorch`
+
+`conda install -r requirements.txt`
+
 ### Venv
 
-`python -m pip install virtualenv`
+`python3 -m pip install virtualenv`
 
 `virtualenv venv-fs-learn`
 
 `source venv/bin/activate`
 
-`python -m pip install ./requirements.txt`
+`python3 -m pip install torch torchvision`
+
+`python3 -m pip install ./requirements.txt`
 
 </details>
 
