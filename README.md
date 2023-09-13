@@ -95,11 +95,11 @@ Lots of experiments were done using basic paper's data by replicating the traini
 All of these uses **nway=30**, **epochs=200** and **iterations_per_epoch=100** for training.
 Then evaluation is performed in different n-ways and k-shots.
 
-| Dataset       | Paper res<br>5-way 5-shot<br><sup>(Acc) | Our res<br>5-way 5-shot<br><sup>(Acc)                                                                                       | Paper res<br>5-way 1-shot<br><sup>(Acc) | Our res<br>5-way 1-shot<br><sup>(Acc)                                                                                   |
-|---------------|-----------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|-----------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
-| mini_imagenet | 68.20                                   | [63.62](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/results/mini_imagenet/train_5shot.png)     | 49.42                                   | [46.13](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/results/mini_imagenet/train_1shot.png) |
-| omniglot      | 98.80                                   | [97.77](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/results/omniglot/train_5shot.png)          | 98.8                                    | [91.93](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/results/omniglot/train_1shot.png)      | 
-| flowers102    | /                                       | [83.40](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/results/flowers102/train_5shot.png) | /                                       | [51.90](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/results/flowers102/train_1shot.png)    | 
+| Dataset       | Paper res<br>5-way 5-shot<br><sup>(Acc) | Our res<br>5-way 5-shot<br><sup>(Acc)                                                                                             | Paper res<br>5-way 1-shot<br><sup>(Acc) | Our res<br>5-way 1-shot<br><sup>(Acc)                                                                                             |
+|---------------|-----------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+| mini_imagenet | 68.20                                   | [63.62](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/blob/main/results/mini_imagenet/train_5shot.png) | 49.42                                   | [46.13](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/blob/main/results/mini_imagenet/train_1shot.png) |
+| omniglot      | 98.80                                   | [97.77](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/blob/main/results/omniglot/train_5shot.png)      | 98.8                                    | [91.93](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/blob/main/results/omniglot/train_1shot.png)      | 
+| flowers102    | /                                       | [84.48](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/blob/main/results/flowers102/train_5shot.png)    | /                                       | [56.08](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/blob/main/results/flowers102/train_1shot.png)    | 
 
 ### Euclidean vs cosine distances
 
@@ -108,9 +108,9 @@ Same results for similar 1-shot and 20-way trainings.
 
 | Dataset | Cosine<br><sup>(acc) | Euclidean<br><sup>(acc) |
 |---------|----------------------|-------------------------|
-| mini_imagenet | TODO                 | 63.62                   |
-| omniglot | 97.77                | 23.48                   |
-| flowers102 | TODO                 | TODO                    |
+| mini_imagenet | 22.36                | **63.62**               |
+| omniglot | 97.77                | **23.48**               |
+| flowers102 | 82.89                | **84.48**               |
 
 
 </details>
