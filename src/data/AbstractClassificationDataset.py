@@ -80,13 +80,36 @@ class AbstractDataset:
         cache_index = 0
         for cl in self.classes:
             path = os.path.join(self.curr_dataset_folder, cl)
-            images = os.listdir(path)
-            images_num = len(images)
-            for i, img_file in enumerate(images):
-                img_path = os.path.join(path, img_file)
-                pil_img = Image.open(img_path)
-                if pil_img.size != self.IMAGE_SIZE:
-                    pil_img = pil_img.resize(self.IMAGE_SIZE)
-                t_img = transforms.PILToTensor()(pil_img)
-                self.cache[cache_index, ...] = t_img
-                cache_index += 1
+            cache_class = load_class_images(path, self.IMAGE_SIZE)
+            self.cache[cache_index:cache_index+cache_class.shape[0], ...] = cache_class
+            cache_index += cache_class.shape[0]
+
+def load_class_images(path, IMAGE_SIZE) -> torch.tensor:
+    """
+    Loads all images in a folder as a tensor with size.
+    :param path: Images dir
+    :param IMAGE_SIZE: Requested image size e.g. (64, 64)
+    :return: tensor IAMGES_COUNT X C X H X W
+    """
+    images = os.listdir(path)
+    cache = torch.rand(size=(len(images), 3, IMAGE_SIZE[0], IMAGE_SIZE[1]))
+    cache_index = 0
+    for i, img_file in enumerate(images):
+        img_path = os.path.join(path, img_file)
+        t_img = load_image(img_path, IMAGE_SIZE)
+        cache[cache_index, ...] = t_img
+        cache_index += 1
+    return cache
+
+def load_image(img_path: str, requested_size: tuple = None) -> torch.tensor:
+    """
+    Loads an image into a tensor
+    :param img_path: Image path
+    :param requested_size: Requested image size e.g. (64, 64)
+    :return: tensor C X H X W
+    """
+    pil_img = Image.open(img_path)
+    if requested_size is not None and pil_img.size != requested_size:
+        pil_img = pil_img.resize(requested_size)
+    t_img = transforms.PILToTensor()(pil_img)
+    return t_img

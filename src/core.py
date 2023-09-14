@@ -13,6 +13,9 @@ from src.prototypical_loss import prototypical_loss, euclidean_dist, cosine_dist
 from src.data.MiniImagenetDataset import MiniImagenetDataset
 from src.data.OmniglotDataset import OmniglotDataset
 from src.data.Flowers102Dataset import Flowers102Dataset
+from src.data.AbstractClassificationDataset import load_class_images, load_image
+
+from src.data.centroids import load_centroids, save_centroids
 
 # example train algo from https://github.com/pytorch/examples/blob/main/mnist/main.py
 # Loading datasets from https://github.com/learnables/learn2learn/tree/master#learning-domains
@@ -64,11 +67,11 @@ def save_yaml_config(training_dir, config):
         file.write(yaml.dump(config))
 
 
-def init_savemodel() -> str:
+def init_savemodel(prefix="train") -> str:
     main_dir = "runs"
     if not os.path.exists(main_dir): os.mkdir(main_dir)
     i = 0
-    build_dir = lambda idx: f"{main_dir}/train_{idx}"
+    build_dir = lambda idx: f"{main_dir}/{prefix}_{idx}"
     out_dir = build_dir(i)
     while os.path.exists(out_dir):
         out_dir = build_dir(i)
@@ -218,3 +221,55 @@ def meta_test(model_path, episodes_per_epoch=100, dataset='mini_imagenet', use_g
         avg_acc = np.mean(val_acc[-episodes_per_epoch:])
     print(f"Avg Test Acc: {avg_acc}")
 
+
+def learn(model_path: str, data_path: str, images_size=None, use_gpu=False):
+    device = build_device(use_gpu)
+    print(f"Creating Prototype model on {device} from {model_path}")
+    model = PrototypicalNetwork().to(device)
+    model.load_state_dict(torch.load(model_path))
+
+    out_dir = init_savemodel("centroids")
+
+    model.eval()
+    with torch.no_grad():
+        classes = list(os.listdir(data_path))
+        for cl in tqdm(classes, total=len(classes)):
+            class_samples = load_class_images(os.path.join(data_path, cl), (images_size, images_size))
+            class_samples = class_samples.to(device)
+            embeddings = model(class_samples)
+            centroids = embeddings.mean(dim=0)
+            save_centroids(os.path.join(out_dir, cl), centroids.to('cpu'))
+    print(f"Deployed to {out_dir}")
+
+def predict(model_path: str, centroids_path: str, images_path: list, images_size=None, batch_size=4, use_gpu=False):
+    device = build_device(use_gpu)
+    print(f"Creating Prototype model on {device} from {model_path}")
+    model = PrototypicalNetwork().to(device)
+    model.load_state_dict(torch.load(model_path))
+
+    prototypes, classes = load_centroids(centroids_path)
+
+    # TODO: optimize with batch size
+
+    size = (images_size, images_size)
+
+    model.eval()
+    with torch.no_grad():
+        i = 0
+        while i < len(images_path):
+            batch = []
+            images = []
+            for j in range(batch_size):
+                if i+j >= len(images_path): break
+                images.append(images_path[i + j])
+                batch.append(load_image(images_path[i + j], size).float())
+            i += len(batch)
+            if len(batch) == 0: break
+            sample = torch.stack(batch)
+            sample = sample.to(device)
+            sample = model(sample)
+            sample = sample.to("cpu")
+            distances = euclidean_dist(prototypes, sample)
+            for k, imp in zip(range(distances.shape[1]), images):
+                classification = classes[torch.argmin(distances[:,k])]
+                print(f"{imp}: {classification}")
