@@ -54,12 +54,12 @@ We used 3 main classification datasets:
 <details open>
 <summary>Usage</summary>
 
-The starter script is **train.py** that has all necessary params to train and validate on a dataset.
+The starter script is **meta_train.py** that has all necessary params to meta-train and meta-test on a dataset.
 
 To replicate the results, launch this training:
 
 ```bash
-python train.py --dataset mini_imagenet \
+python meta_train.py --dataset mini_imagenet \
                 --epochs 200 \
                 --gpu \
                 --train-num-class 30 \
@@ -75,6 +75,19 @@ python train.py --dataset mini_imagenet \
 ```
 
 Implemented datasets are [omniglot, mini_imagenet, flowers102]:
+
+To meta-test, use **meta_test.py** script:
+
+```bash
+python meta_test.py --model "your_model_or_pretrained.py" \
+                --dataset mini_imagenet \
+                --episodes-per-epoch 100 \
+                --gpu \
+                --test-num-class 15 \
+                --test-num-query 15 \
+                --number-support 5 \
+                --distance-function "euclidean"
+```
 
 </details>
 

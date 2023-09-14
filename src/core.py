@@ -83,7 +83,7 @@ def save_model(model, training_dir, name):
 def load_model(path):
     model = torch.load(path)
 
-def train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
+def meta_train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
           train_num_classes=30,
           test_num_class=5,
           train_num_query=15,
@@ -189,7 +189,7 @@ def train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
     print(f"Training duration: {str(duration)}")
     print(f"Best val/acc {best_acc*100:.2f} on epoch {best_acc_ep}")
 
-def test(model_path, episodes_per_epoch=100, dataset='mini_imagenet', use_gpu=False,
+def meta_test(model_path, episodes_per_epoch=100, dataset='mini_imagenet', use_gpu=False,
          test_num_query=15,
           test_num_class=5,
           number_support=5,
