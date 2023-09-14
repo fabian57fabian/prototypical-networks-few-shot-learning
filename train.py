@@ -8,7 +8,7 @@ if __name__ == '__main__':
     parser.add_argument('--gpu', action='store_true', help='use gpu or not')
     parser.add_argument('--train-num-query', '--train-query', type=int, default=15, help='Number of queries samples per class during training.')
     parser.add_argument('--train-num-class', '--train-way', type=int, default=30, help='Number of classes in batch during training.')
-    parser.add_argument('--val-num-class', '--test-way', type=int, default=5, help='Number of classes in batch during validation.')
+    parser.add_argument('--val-num-class', '--val-way', type=int, default=5, help='Number of classes in batch during validation.')
     parser.add_argument('--episodes-per-epoch', type=int, default=100, help='Number of episodes (iterations) per epoch (training/validation).')
     parser.add_argument('--number-support', '--shot', type=int, default=5, help='Number of support samples per class during training.')
     parser.add_argument('--adam-lr', type=float, default=0.001, help='Base learning rate for Adam.')

@@ -63,9 +63,9 @@ python train.py --dataset mini_imagenet \
                 --epochs 200 \
                 --gpu \
                 --train-num-class 30 \
-                --test-num-class 5 \
-                --number-support 5 \
                 --train-num-query 15 \
+                --number-support 5 \
+                --val-num-class 5 \
                 --episodes-per-epoch 100 \
                 --adam-lr 0.001 \
                 --opt-step-size 20 \
