@@ -14,7 +14,7 @@ Create a conda/virtualenv with all necessary packages:
 
 `conda install pytorch torchvision torchaudio -c pytorch`
 
-`conda install -r requirements.txt`
+`conda install --file requirements.txt`
 
 ### Venv
 
