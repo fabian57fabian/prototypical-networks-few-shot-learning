@@ -25,8 +25,7 @@ jobs:
           pip install -r requirements.txt
           pip install six
           pip install torch torchvision
-      - if: ${{ matrix.python-version == "3.11" }}
-        run: pip install --pre torch -f https://download.pytorch.org/whl/nightly/cpu/torch_nightly.html
+          if ${{ matrix.python-version }} == '3.11'; then pip install --pre torch -f https://download.pytorch.org/whl/nightly/cpu/torch_nightly.html ; fil
       #- name: Lint with ruff
       #  run: |
       #    # stop the build if there are Python syntax errors or undefined names
