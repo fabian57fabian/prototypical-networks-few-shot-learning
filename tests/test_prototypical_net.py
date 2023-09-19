@@ -21,6 +21,7 @@ class TestPrototypicalNetwork(TestCase):
         print(f"GetSample avg CPU ms: {mean}, [{durations}]")
 
     def test_forward_gpu(self):
+        assert torch.cuda.is_available(), "cuda not available for tests"
         device = torch.device("cuda:0")
         model = PrototypicalNetwork().to(device)
         x = torch.rand(size=(600, 3, 84, 84)).to(device)
