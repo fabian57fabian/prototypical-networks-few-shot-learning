@@ -12,6 +12,7 @@ class AbstractDataset:
         self.IMAGE_SIZE = (data_shape[0], data_shape[1])
         self.IMAGE_CHANNELS = data_shape[2]
         self.load_on_ram = load_on_ram
+        assert self.load_on_ram, "Currently accepting only RAM loading"
         base_dts = tmp_dir
         dataset_exists = False
         if not os.path.exists(base_dts):
@@ -41,7 +42,7 @@ class AbstractDataset:
         :param NQ: Number of query samples
         :return: ndarray with NC X (NS+NQ) X C X H X W, classes encoded
         """
-        assert NC <= len(self.classes)
+        assert NC <= len(self.classes), "There are less classes than required for this batch. Try lowering number of classes."
 
         indexes = []
         y = []

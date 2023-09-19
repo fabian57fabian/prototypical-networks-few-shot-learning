@@ -3,7 +3,7 @@ import shutil
 from datetime import datetime
 
 from unittest import TestCase
-from src.data.MiniImagenetDataset import MiniImagenetDataset, download_dataset
+from src.data.MiniImagenetDataset import MiniImagenetDataset, download_dataset_miniimagenet
 
 
 class TestMiniImagenetDataset(TestCase):
@@ -39,7 +39,7 @@ class TestMiniImagenetDataset(TestCase):
     def test_download_dataset(self):
         _dir = "tmp_dts"
         if os.path.exists(_dir): shutil.rmtree(_dir)
-        download_dataset(_dir)
+        download_dataset_miniimagenet(_dir)
         assert os.path.exists(_dir)
         train_dir = os.path.join(_dir, "train")
         val_dir = os.path.join(_dir, "val")

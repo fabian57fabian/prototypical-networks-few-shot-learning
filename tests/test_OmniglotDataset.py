@@ -4,7 +4,7 @@ import shutil
 from unittest import TestCase
 from src.data.OmniglotDataset import OmniglotDataset
 
-class OmniglotDataset(TestCase):
+class TestOmniglotDataset(TestCase):
     def test_constructor_download(self):
         _dts_dir = "datasets_og"
         if os.path.exists(_dts_dir): shutil.rmtree(_dts_dir)

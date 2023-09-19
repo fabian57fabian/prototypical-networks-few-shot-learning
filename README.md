@@ -76,6 +76,35 @@ python meta_train.py --dataset mini_imagenet \
 
 Implemented datasets are [omniglot, mini_imagenet, flowers102]:
 
+To **train** with your **own custom dataset**, set --dataset toy our dataset folder. 
+<br/>
+Rember, your custom dataset should have this format:
+
+```bash
+├── train
+│   ├── class1
+│   │   ├── img1.jpg
+│   │   ├── ...
+│   ├── class2
+│   │   ├── ...
+│   ├── ...
+├── val
+│   ├── class3
+│   │   ├── img57.jpg
+│   │   ├── ...
+│   ├── class4
+│   │   ├── ...
+│   ├── ...
+├── test
+│   ├── class5
+│   │   ├── img182.jpg
+│   │   ├── ...
+│   ├── class6
+│   │   ├── ...
+│   ├── ...
+```
+
+
 To meta-test, use **meta_test.py** script:
 
 ```bash

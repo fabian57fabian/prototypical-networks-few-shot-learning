@@ -13,6 +13,7 @@ from src.prototypical_loss import prototypical_loss, euclidean_dist, cosine_dist
 from src.data.MiniImagenetDataset import MiniImagenetDataset
 from src.data.OmniglotDataset import OmniglotDataset
 from src.data.Flowers102Dataset import Flowers102Dataset
+from src.data.CustomDataset import CustomDataset
 from src.data.AbstractClassificationDataset import load_class_images, load_image
 
 from src.data.centroids import load_centroids, save_centroids
@@ -21,7 +22,11 @@ from src.data.centroids import load_centroids, save_centroids
 # Loading datasets from https://github.com/learnables/learn2learn/tree/master#learning-domains
 
 
-def build_dataloaders(dataset='mini_imagenet', size=None, only_test=False):
+def get_allowed_base_datasets_names() -> list:
+    return ["mini_imagenet", "omniglot", "flowers102"]
+
+
+def build_dataloaders(dataset='mini_imagenet', size=None, channels=None, only_test=False):
     if dataset == 'mini_imagenet':
         # Loading datasets
         test_loader = MiniImagenetDataset(mode='test', load_on_ram=True, download=True, images_size=size, tmp_dir="datasets")
@@ -40,6 +45,12 @@ def build_dataloaders(dataset='mini_imagenet', size=None, only_test=False):
         if only_test: return None, None, test_loader
         train_loader = Flowers102Dataset(mode='train', load_on_ram=True, download=False, images_size=size, tmp_dir="datasets")
         valid_loader = Flowers102Dataset(mode='val', load_on_ram=True, download=False, images_size=size, tmp_dir="datasets")
+        return train_loader, valid_loader, test_loader
+    elif os.path.exists(dataset):
+        test_loader = CustomDataset(mode='test', load_on_ram=True, images_size=size, image_ch=channels, dataset_path=dataset)
+        if only_test: return None, None, test_loader
+        train_loader = CustomDataset(mode='train', load_on_ram=True, images_size=size, image_ch=channels, dataset_path=dataset)
+        valid_loader = CustomDataset(mode='val', load_on_ram=True, images_size=size, image_ch=channels, dataset_path=dataset)
         return train_loader, valid_loader, test_loader
     assert False, "dataset unknown"
 
@@ -96,12 +107,13 @@ def meta_train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
           optim_gamma = 0.5,
           distance_function="euclidean",
           images_size=None,
+          images_ch=None,
           save_each=5,
           eval_each=1):
     training_dir = init_savemodel()
     print(f"Writing to {training_dir}")
     writer = SummaryWriter(log_dir=training_dir)
-    loaders = build_dataloaders(dataset, images_size)
+    loaders = build_dataloaders(dataset, images_size, images_ch)
     train_loader, valid_loader, test_loader = loaders
     device = build_device(use_gpu)
     print(f"Creating Prototype model on {device}")
