@@ -209,8 +209,9 @@ def meta_test(model_path, episodes_per_epoch=100, dataset='mini_imagenet', use_g
           test_num_class=5,
           number_support=5,
           distance_function="euclidean",
-          images_size=None):
-    _, _, test_loader = build_dataloaders(dataset, images_size, only_test=True)
+          images_size=None,
+          images_ch=None):
+    _, _, test_loader = build_dataloaders(dataset, images_size, images_ch, only_test=True)
     device = build_device(use_gpu)
     print(f"Creating Prototype model on {device} from {model_path}")
     model = PrototypicalNetwork().to(device)
@@ -234,7 +235,7 @@ def meta_test(model_path, episodes_per_epoch=100, dataset='mini_imagenet', use_g
     print(f"Avg Test Acc: {avg_acc}")
 
 
-def learn(model_path: str, data_path: str, images_size=None, use_gpu=False):
+def learn(model_path: str, data_path: str, images_size=None, images_ch=None, use_gpu=False):
     device = build_device(use_gpu)
     print(f"Creating Prototype model on {device} from {model_path}")
     model = PrototypicalNetwork().to(device)
@@ -246,7 +247,7 @@ def learn(model_path: str, data_path: str, images_size=None, use_gpu=False):
     with torch.no_grad():
         classes = list(os.listdir(data_path))
         for cl in tqdm(classes, total=len(classes)):
-            class_samples = load_class_images(os.path.join(data_path, cl), (images_size, images_size))
+            class_samples = load_class_images(os.path.join(data_path, cl), (images_size, images_size), images_ch)
             class_samples = class_samples.to(device)
             embeddings = model(class_samples)
             centroids = embeddings.mean(dim=0)

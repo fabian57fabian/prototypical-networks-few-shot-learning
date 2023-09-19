@@ -12,8 +12,9 @@ if __name__ == '__main__':
     parser.add_argument('--number-support', '--shot', type=int, default=5, help='Number of support samples per class during test.')
     parser.add_argument('--distance-function', type=str, default="euclidean", choices=["eucldean", "cosine"], help='Distance function.')
     parser.add_argument('--image-size', type=int, default=None, help='Convert in a different square size the image from dataset.')
+    parser.add_argument('--image-ch', type=int, default=None, help='Convert in a different channel size the image from dataset.')
     args = parser.parse_args()
 
     meta_test(args.model, args.episodes_per_epoch, args.dataset, args.gpu,
          args.test_num_query, args.test_num_class, args.number_support,
-         args.distance_function, args.image_size)
+         args.distance_function, args.image_size, args.image_ch)

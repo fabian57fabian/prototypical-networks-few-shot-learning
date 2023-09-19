@@ -81,19 +81,21 @@ class AbstractDataset:
         cache_index = 0
         for cl in self.classes:
             path = os.path.join(self.curr_dataset_folder, cl)
-            cache_class = load_class_images(path, self.IMAGE_SIZE)
+            cache_class = load_class_images(path, self.IMAGE_SIZE, self.IMAGE_CHANNELS)
             self.cache[cache_index:cache_index+cache_class.shape[0], ...] = cache_class
             cache_index += cache_class.shape[0]
 
-def load_class_images(path, IMAGE_SIZE) -> torch.tensor:
+def load_class_images(path, IMAGE_SIZE, CHANNELS) -> torch.tensor:
     """
     Loads all images in a folder as a tensor with size.
     :param path: Images dir
     :param IMAGE_SIZE: Requested image size e.g. (64, 64)
+    :param CHANNELS: Requested image channnels e.g. 1 or 3
     :return: tensor IAMGES_COUNT X C X H X W
     """
+    if CHANNELS is None: CHANNELS = 3
     images = os.listdir(path)
-    cache = torch.rand(size=(len(images), 3, IMAGE_SIZE[0], IMAGE_SIZE[1]))
+    cache = torch.rand(size=(len(images), CHANNELS, IMAGE_SIZE[0], IMAGE_SIZE[1]))
     cache_index = 0
     for i, img_file in enumerate(images):
         img_path = os.path.join(path, img_file)
