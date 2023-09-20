@@ -1,6 +1,8 @@
 # Few-Shot learning with Prototypes Networks
 Simple implementation of prototypical networks in few shot learning
 
+[![Python package](https://github.com/fabian57fabian/prototypical-networks-few-shot-learning/actions/workflows/ci.yml/badge.svg)](https://github.com/fabian57fabian/prototypical-networks-few-shot-learning/actions/workflows/ci.yml)
+
 <details>
 <summary>Installation</summary>
 
