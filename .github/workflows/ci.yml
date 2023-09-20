@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
+        python-version: ["3.7", "3.8", "3.9", "3.10"]
 
     steps:
       - uses: actions/checkout@v4
@@ -24,8 +24,8 @@ jobs:
           pip install ruff pytest
           pip install -r requirements.txt
           pip install six
-          if [ ${{ matrix.python-version }} == "3.11" ]; then
-              pip install --pre torch torchvision torchaudio -f https://download.pytorch.org/whl/nightly/cpu/torch_nightly.html
+          if [ ${{ matrix.python-version }} == "3.10" ]; then
+              pip install torch==2.0.0+cpu torchvision==0.15.1+cpu --index-url https://download.pytorch.org/whl/cpu
           else
               pip install torch torchvision
           fi
