@@ -2,6 +2,7 @@ import os
 import shutil
 import random
 
+from src.utils import download_file_from_url
 from src.data.AbstractClassificationDataset import AbstractDataset
 
 
@@ -45,7 +46,7 @@ def download_dataset_flowers102(dest_dir):
     tmp_dest_dir = os.path.join(dest_dir, "tmp")
     if not os.path.exists(tmp_dest_dir):
         os.mkdir(tmp_dest_dir)
-    os.system(f'wget -q "{url}" -P {dest_dir}')
+    download_file_from_url(url, dest_dir)
     zip_file = os.path.join(dest_dir,'flowers102.zip')
     os.system(f"unzip -q {zip_file} -d {tmp_dest_dir}")
     os.remove(zip_file)

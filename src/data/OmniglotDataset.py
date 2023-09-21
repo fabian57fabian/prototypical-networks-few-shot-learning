@@ -4,6 +4,7 @@ import shutil
 from tqdm import tqdm
 
 from PIL import Image
+from src.utils import download_file_from_url
 from src.data.AbstractClassificationDataset import AbstractDataset
 
 def read_alphabets_in_splits(filename):
@@ -58,7 +59,7 @@ def download_dataset_omniglot(dest_dir):
     tmp_dest_dir = os.path.join(dest_dir, "tmp")
     if not os.path.exists(tmp_dest_dir):
         os.mkdir(tmp_dest_dir)
-    os.system(f'wget -q "{url}" -P {dest_dir}')
+    download_file_from_url(url, dest_dir)
     zip_file = os.path.join(dest_dir,'omniglot.zip')
     os.system(f"unzip -q {zip_file} -d {tmp_dest_dir}")
     os.remove(zip_file)

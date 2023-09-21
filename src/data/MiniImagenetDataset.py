@@ -1,12 +1,13 @@
 import os
 
+from src.utils import download_file_from_url
 from src.data.AbstractClassificationDataset import AbstractDataset
 
 def download_dataset_miniimagenet(dest_dir):
     url = "https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/releases/download/v0.1/mini_imagenet.zip"
     if not os.path.exists(dest_dir):
         os.mkdir(dest_dir)
-    os.system(f'wget -q "{url}" -P {dest_dir}')
+    download_file_from_url(url, dest_dir)
     zip_file = os.path.join(dest_dir,'mini_imagenet.zip')
     os.system(f"unzip -q {zip_file} -d {dest_dir}")
     os.remove(zip_file)
