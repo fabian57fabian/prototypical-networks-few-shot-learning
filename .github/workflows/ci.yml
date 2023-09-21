@@ -32,7 +32,7 @@ jobs:
           fi
       - name: Test with pytest
         run: |
-          pytest
+          coverage run -m pytest tests/
       - name: Upload coverage data to coveralls.io
         run: coveralls --service=github
         env:
