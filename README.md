@@ -2,6 +2,7 @@
 Simple implementation of prototypical networks in few shot learning
 
 [![Python package](https://github.com/fabian57fabian/prototypical-networks-few-shot-learning/actions/workflows/ci.yml/badge.svg)](https://github.com/fabian57fabian/prototypical-networks-few-shot-learning/actions/workflows/ci.yml)
+[![Coverage Status](https://coveralls.io/repos/github/fabian57fabian/prototypical-networks-few-shot-learning/badge.svg?branch=actions-coveralls)](https://coveralls.io/github/fabian57fabian/prototypical-networks-few-shot-learning?branch=actions-coveralls)
 
 <details>
 <summary>Installation</summary>
