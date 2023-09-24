@@ -59,7 +59,7 @@ We used 3 main classification datasets:
 
 The starter script is **meta_train.py** that has all necessary params to meta-train and meta-test on a dataset.
 
-To replicate the results, launch this training:
+To replicate the results, launch this training (writes to runs/train_X):
 
 ```bash
 python meta_train.py --dataset mini_imagenet \
@@ -120,6 +120,32 @@ python meta_test.py --model "your_model_or_pretrained.py" \
                 --number-support 5 \
                 --distance-function "euclidean"
 ```
+
+To learn centroids for new data, use **learn_centroids.py** script (writes to runs/centroids_Y):
+
+```bash
+python learn_centroids.py --model "your_model_or_pretrained.py" \
+                --data your_folder_with_classes_of_images \
+                --image-size 64 \
+                --image-ch 3 \
+                --gpu
+```
+
+This will take all classes inside _your_folder_with_classes_of_images_ dir and calculate centroids for classification task.
+
+
+To use centroids for classification on new images, use **predict.py** script (outputs results):
+
+```bash
+python predict.py --model "your_model_or_pretrained.py" \
+                --centroids runs/centroids_0 \
+                --images-path a_path_with_new_images \
+                --image-size 64 \
+                --batch-size 4 \
+                --gpu
+```
+
+This will perform predictions by printing out all classes based on images in _a_path_with_new_images_ .
 
 </details>
 
