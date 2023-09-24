@@ -17,6 +17,9 @@ from src.data.CustomDataset import CustomDataset
 from src.data.AbstractClassificationDataset import load_class_images, load_image
 
 from src.data.centroids import load_centroids, save_centroids
+from src import __version__
+
+print(f"***** Few-shot Learning with proto nets. v{__version__} *****")
 
 # example train algo from https://github.com/pytorch/examples/blob/main/mnist/main.py
 # Loading datasets from https://github.com/learnables/learn2learn/tree/master#learning-domains
