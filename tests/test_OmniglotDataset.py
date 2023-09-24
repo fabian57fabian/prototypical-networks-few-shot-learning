@@ -11,12 +11,9 @@ class TestOmniglotDataset(TestCase):
         self.tmp_downlaod_dir = "tmp_download_omniglot"
         self.dts_dir = "datasetstest_omniglot"
         if os.path.exists(self.dts_dir): shutil.rmtree(self.dts_dir)
-        try:
-            OmniglotDataset.URL = "https://github.com/fabian57fabian/prototypical-networks-few-shot-learning/releases/download/v0.0-unit-tests-dataset-mini_imagenet/omniglot.zip"
-            self.dl = OmniglotDataset(load_on_ram=True, download=True, tmp_dir=self.dts_dir, images_size=10)
-        except Exception as e:
-            print("Unable to download/load 'omniglot'")
-            assert False, str(e)
+
+        OmniglotDataset.URL = "https://github.com/fabian57fabian/prototypical-networks-few-shot-learning/releases/download/v0.0-unit-tests-dataset-mini_imagenet/omniglot.zip"
+        self.dl = OmniglotDataset(load_on_ram=True, download=True, tmp_dir=self.dts_dir, images_size=10)
 
     def tearDown(self) -> None:
         if os.path.exists(self.dts_dir): shutil.rmtree(self.dts_dir)

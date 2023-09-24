@@ -18,9 +18,5 @@ class TestPrototypicalNetwork(TestCase):
             out = model(x)
             duration = (datetime.now() - start_time).total_seconds() * 1000
             return duration
-        try:
-            durations = [get_time() for _ in range(5)]
-        except Exception as e:
-            print("Got errors while forwarding on torch")
-            assert False, "not runned on torch: " + str(e)
+        urations = [get_time() for _ in range(5)]
         assert True

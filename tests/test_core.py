@@ -4,7 +4,7 @@ import shutil
 import numpy as np
 from PIL import Image
 from unittest import TestCase
-from src.core import get_allowed_base_datasets_names, meta_train, meta_test, learn, predict
+from src.core import cosine_dist, euclidean_dist, init_savemodel, build_device, build_distance_function, get_allowed_base_datasets_names, build_dataloaders, meta_train, meta_test, learn, predict
 
 
 class TestCore(TestCase):
@@ -17,8 +17,6 @@ class TestCore(TestCase):
 
         # Create centroids for learn()
         self.path_learn = "test_dataset_test_to_load"
-        if os.path.exists(self.path_learn):
-            shutil.rmtree(self.path_learn)
         os.mkdir(self.path_learn)
         self.centroids_images = 5
         self.classes_num = 3
@@ -34,8 +32,6 @@ class TestCore(TestCase):
 
         # Create data for meta_train()
         self.base_datasets_meta_train = "datasets"
-        if os.path.exists(self.base_datasets_meta_train):
-            shutil.rmtree(self.base_datasets_meta_train)
         os.mkdir(self.base_datasets_meta_train)
         custom_dts_name = "custom_1"
         self.datasets_to_meta_learn = [custom_dts_name, "mini_imagenet", "omniglot", "flowers102"]
@@ -75,8 +71,6 @@ class TestCore(TestCase):
             self.classes_of_predict.append(class_name)
         # Create images for predict()
         self.path_images_predict = "images_predict"
-        if os.path.exists(self.path_images_predict):
-            shutil.rmtree(self.path_images_predict)
         os.mkdir(self.path_images_predict)
         self.num_images_predict = 2
         for i in range(self.num_images_predict):
@@ -108,37 +102,39 @@ class TestCore(TestCase):
         assert len(ad) == 3
 
     def test_meta_train(self):
-        for i, (dts, ch) in enumerate(zip(self.datasets_to_meta_learn, self.channels_to_meta_learn)):
-            dataset = dts
-            epochs = 2
-            gpu = False
-            adam_lr = 0.1
-            train_num_class = self.meta_train_classes_num - 1
-            val_num_class = int(self.meta_train_classes_num / 2)
-            usable_supp_query = self.meta_train_images - 2
-            train_num_query = int(usable_supp_query * .4)
-            number_support = int(usable_supp_query * .6)
-            episodes_per_epoch = 10
-            opt_step_size = 20
-            opt_gamma = .5
-            distance_function ="euclidean"
-            image_size = 16
-            image_ch = ch
-            save_each = 1
-            eval_each = 2
+        for distance_fn in ["cosine", "euclidean"]:
+            for dts, ch in zip(self.datasets_to_meta_learn, self.channels_to_meta_learn):
+                dataset = dts
+                epochs = 2
+                gpu = False
+                adam_lr = 0.1
+                train_num_class = self.meta_train_classes_num - 1
+                val_num_class = int(self.meta_train_classes_num / 2)
+                usable_supp_query = self.meta_train_images - 2
+                train_num_query = int(usable_supp_query * .4)
+                number_support = int(usable_supp_query * .6)
+                episodes_per_epoch = 10
+                opt_step_size = 20
+                opt_gamma = .5
+                distance_function = distance_fn
+                image_size = 16
+                image_ch = ch
+                save_each = 1
+                eval_each = 2
 
-            meta_train(dataset, epochs, gpu, adam_lr,
-                       train_num_class, val_num_class, train_num_query, number_support,
-                       episodes_per_epoch, opt_step_size, opt_gamma, distance_function,
-                       image_size, image_ch, save_each, eval_each)
-            assert os.path.exists("runs")
-            path_run = f"runs/train_{i}"
-            assert os.path.exists(path_run)
-            files = list(os.listdir(path_run))
-            assert "model_best.pt" in files
-            for i in range(epochs + 1):
-                assert f"model_{i}.pt" in files
-            assert "config.yaml" in files
+                meta_train(dataset, epochs, gpu, adam_lr,
+                           train_num_class, val_num_class, train_num_query, number_support,
+                           episodes_per_epoch, opt_step_size, opt_gamma, distance_function,
+                           image_size, image_ch, save_each, eval_each)
+                assert os.path.exists("runs")
+                path_run = f"runs/train_0"
+                assert os.path.exists(path_run), f"Run not found in {path_run}"
+                files = list(os.listdir(path_run))
+                assert "model_best.pt" in files
+                for i in range(epochs + 1):
+                    assert f"model_{i}.pt" in files
+                assert "config.yaml" in files
+                shutil.rmtree(path_run)
 
     def test_meta_test(self):
         dataset_to_test_index = 1
@@ -191,3 +187,29 @@ class TestCore(TestCase):
         for (cls, classification), im_path in zip(res, images):
             assert classification in self.classes_of_predict
             assert cls == im_path
+
+    def test_build_dataloaders(self):
+        with self.assertRaises(Exception) as context:
+            build_dataloaders(str(uuid.uuid4()), 28, 3)
+        assert "dataset unknown" in context.exception.args
+
+    def test_init_savemodel(self):
+        prefix = "wow"
+        init_savemodel(prefix)
+        assert os.path.exists(os.path.join("runs", f"{prefix}_0"))
+        init_savemodel(prefix)
+        assert os.path.exists(os.path.join("runs", f"{prefix}_1"))
+
+    def test_build_distance_function(self):
+        func1 = build_distance_function("cosine")
+        assert func1 == cosine_dist
+        func2 = build_distance_function("euclidean")
+        assert func2 == euclidean_dist
+        with self.assertRaises(Exception) as context:
+            _ = build_distance_function("aaaaaaaaaaaaaaaaaaaaaaa")
+        assert "Wrong distance function supplied" in context.exception.args
+
+    def test_build_device(self):
+        _ = build_device('cpu')
+        _ = build_device('gpu')
+

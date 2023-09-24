@@ -52,7 +52,7 @@ def build_dataloaders(dataset='mini_imagenet', size=None, channels=None, only_te
         train_loader = CustomDataset(mode='train', load_on_ram=True, images_size=size, image_ch=channels, dataset_path=dataset)
         valid_loader = CustomDataset(mode='val', load_on_ram=True, images_size=size, image_ch=channels, dataset_path=dataset)
         return train_loader, valid_loader, test_loader
-    assert False, "dataset unknown"
+    raise Exception("dataset unknown")
 
 
 def build_device(use_gpu=False):
@@ -66,12 +66,13 @@ def build_device(use_gpu=False):
 
 
 def build_distance_function(distance_function: str):
-    assert distance_function in ["euclidean", "cosine"]
+    if distance_function not in ["euclidean", "cosine"]:
+        raise Exception("Wrong distance function supplied")
+
     if distance_function == "euclidean":
         return euclidean_dist
     elif distance_function == "cosine":
         return cosine_dist
-    assert False, "Wrong distance function supplied"
 
 def save_yaml_config(training_dir, config):
     with open(os.path.join(training_dir, "config.yaml"), 'w') as file:
@@ -93,9 +94,6 @@ def init_savemodel(prefix="train") -> str:
 
 def save_model(model, training_dir, name):
     torch.save(model.state_dict(), os.path.join(training_dir, name))
-
-def load_model(path):
-    model = torch.load(path)
 
 def meta_train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
           train_num_classes=30,
