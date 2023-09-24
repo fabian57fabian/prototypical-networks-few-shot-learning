@@ -15,7 +15,7 @@ class AbstractDataset:
         assert self.load_on_ram, "Currently accepting only RAM loading"
         base_dts = tmp_dir
         dataset_exists = False
-        if not os.path.exists(base_dts):
+        if not os.path.exists(base_dts) and base_dts != '':
             os.mkdir(base_dts)
         self.dts_dir = os.path.join(base_dts, dataset_name)
         if not os.path.exists(self.dts_dir):

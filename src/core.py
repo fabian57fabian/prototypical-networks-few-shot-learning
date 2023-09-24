@@ -152,7 +152,7 @@ def meta_train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
     start_time = datetime.datetime.now()
 
     print(f"Startring training at {str(start_time)}")
-    for epoch in range(epochs):
+    for epoch in range(epochs + 1):
         model.train()
         # Train
         for i in tqdm(range(episodes_per_epoch), total=episodes_per_epoch): # should be enough to cover batch*100 >= dataset_size
@@ -210,7 +210,7 @@ def meta_test(model_path, episodes_per_epoch=100, dataset='mini_imagenet', use_g
           number_support=5,
           distance_function="euclidean",
           images_size=None,
-          images_ch=None):
+          images_ch=None) -> float:
     _, _, test_loader = build_dataloaders(dataset, images_size, images_ch, only_test=True)
     device = build_device(use_gpu)
     print(f"Creating Prototype model on {device} from {model_path}")
@@ -233,6 +233,7 @@ def meta_test(model_path, episodes_per_epoch=100, dataset='mini_imagenet', use_g
             val_acc.append(acc.item())
         avg_acc = np.mean(val_acc[-episodes_per_epoch:])
     print(f"Avg Test Acc: {avg_acc}")
+    return float(avg_acc)
 
 
 def learn(model_path: str, data_path: str, images_size=None, images_ch=None, use_gpu=False):
@@ -254,7 +255,7 @@ def learn(model_path: str, data_path: str, images_size=None, images_ch=None, use
             save_centroids(os.path.join(out_dir, cl), centroids.to('cpu'))
     print(f"Deployed to {out_dir}")
 
-def predict(model_path: str, centroids_path: str, images_path: list, images_size=None, batch_size=4, use_gpu=False):
+def predict(model_path: str, centroids_path: str, images_path: list, images_size=None, batch_size=4, use_gpu=False) -> list:
     device = build_device(use_gpu)
     print(f"Creating Prototype model on {device} from {model_path}")
     model = PrototypicalNetwork().to(device)
@@ -267,6 +268,7 @@ def predict(model_path: str, centroids_path: str, images_path: list, images_size
     size = (images_size, images_size)
 
     model.eval()
+    results = []
     with torch.no_grad():
         i = 0
         while i < len(images_path):
@@ -286,3 +288,5 @@ def predict(model_path: str, centroids_path: str, images_path: list, images_size
             for k, imp in zip(range(distances.shape[1]), images):
                 classification = classes[torch.argmin(distances[:,k])]
                 print(f"{imp}: {classification}")
+                results.append((imp, classification))
+    return results
