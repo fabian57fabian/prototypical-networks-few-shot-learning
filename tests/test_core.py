@@ -10,7 +10,9 @@ from src.core import get_allowed_base_datasets_names, meta_train, meta_test, lea
 class TestCore(TestCase):
 
     def setUp(self) -> None:
-        self.model_to_use = "../models/omniglot_28_5shot.pt"
+        self.model_to_use = "omniglot_28_5shot.pt"
+        link_download = "https://github.com/fabian57fabian/prototypical-networks-few-shot-learning/releases/download/v0.0-unit-tests-dataset-mini_imagenet/omniglot_28_5shot.pt"
+        os.system(f"wget {link_download} -P ./")
         self.model_outputs = 64
 
         # Create centroids for learn()
@@ -82,6 +84,9 @@ class TestCore(TestCase):
             Image.new('RGB', (28, 28)).save(im_path)
 
     def tearDown(self) -> None:
+        if os.path.exists(self.model_to_use):
+            os.remove(self.model_to_use)
+
         if os.path.exists(self.base_datasets_meta_train):
             shutil.rmtree(self.base_datasets_meta_train)
 
