@@ -12,6 +12,7 @@ class TestOmniglotDataset(TestCase):
         self.dts_dir = "datasetstest_omniglot"
         if os.path.exists(self.dts_dir): shutil.rmtree(self.dts_dir)
         try:
+            OmniglotDataset.URL = "https://github.com/fabian57fabian/prototypical-networks-few-shot-learning/releases/download/v0.0-unit-tests-dataset-mini_imagenet/omniglot.zip"
             self.dl = OmniglotDataset(load_on_ram=True, download=True, tmp_dir=self.dts_dir, images_size=10)
         except Exception as e:
             print("Unable to download/load 'omniglot'")
@@ -32,7 +33,7 @@ class TestOmniglotDataset(TestCase):
                 assert len(os.listdir(os.path.join(p, ch))) > 0
 
     def test_getsample(self):
-        NC, NS, NQ = 20, 5, 6
+        NC, NS, NQ = 2, 2, 1
         start_time = datetime.now()
         sample = self.dl.GetSample(NC, NS, NQ)
         duration = (datetime.now() - start_time).total_seconds() * 1000
@@ -47,7 +48,7 @@ class TestOmniglotDataset(TestCase):
     def test_download_dataset(self):
         _dir = self.tmp_downlaod_dir
         if os.path.exists(_dir): shutil.rmtree(_dir)
-        download_dataset_omniglot(_dir)
+        download_dataset_omniglot(_dir, "https://github.com/fabian57fabian/prototypical-networks-few-shot-learning/releases/download/v0.0-unit-tests-dataset-mini_imagenet/omniglot.zip")
         assert os.path.exists(_dir)
         train_dir = os.path.join(_dir, "train")
         val_dir = os.path.join(_dir, "val")

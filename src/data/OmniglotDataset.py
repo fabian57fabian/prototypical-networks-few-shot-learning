@@ -52,8 +52,7 @@ def postprocess_dataset(src_dir, dest_dir):
     postprocess_this_dir(val_alp, path_dataset_val)
     postprocess_this_dir(test_alp, path_dataset_test)
 
-def download_dataset_omniglot(dest_dir):
-    url = "https://github.com/fabian57fabian/prototypical-networks-few-shot-learning/releases/download/v0.2-dataset-omniglot/omniglot.zip"
+def download_dataset_omniglot(dest_dir, url):
     if not os.path.exists(dest_dir):
         os.mkdir(dest_dir)
     tmp_dest_dir = os.path.join(dest_dir, "tmp")
@@ -68,6 +67,7 @@ def download_dataset_omniglot(dest_dir):
 
 
 class OmniglotDataset(AbstractDataset):
+    URL = "https://github.com/fabian57fabian/prototypical-networks-few-shot-learning/releases/download/v0.2-dataset-omniglot/omniglot.zip"
     def __init__(self, mode='train', load_on_ram=True, download=True, images_size=None, tmp_dir="datasets"):
         images_size = 28 if images_size is None else images_size
-        super().__init__(mode, (images_size, images_size, 1), load_on_ram, download, tmp_dir,"omniglot", download_dataset_omniglot)
+        super().__init__(mode, (images_size, images_size, 1), load_on_ram, download, tmp_dir,"omniglot", download_dataset_omniglot, OmniglotDataset.URL)

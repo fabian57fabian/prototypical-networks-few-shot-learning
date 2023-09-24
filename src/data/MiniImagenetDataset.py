@@ -3,8 +3,7 @@ import os
 from src.utils import download_file_from_url
 from src.data.AbstractClassificationDataset import AbstractDataset
 
-def download_dataset_miniimagenet(dest_dir):
-    url = "https://github.com/fabian57fabian/prototypical-networks-few-shot-learning/releases/download/v0.1-dataset-mini_imagenet/mini_imagenet.zip"
+def download_dataset_miniimagenet(dest_dir, url):
     if not os.path.exists(dest_dir):
         os.mkdir(dest_dir)
     download_file_from_url(url, dest_dir)
@@ -21,6 +20,7 @@ def download_dataset_miniimagenet(dest_dir):
 
 
 class MiniImagenetDataset(AbstractDataset):
+    URL = "https://github.com/fabian57fabian/prototypical-networks-few-shot-learning/releases/download/v0.1-dataset-mini_imagenet/mini_imagenet.zip"
     def __init__(self, mode='train', load_on_ram=True, download=True, images_size=None, tmp_dir="datasets"):
         images_size = 84 if images_size is None else images_size
-        super().__init__(mode, (images_size, images_size, 3), load_on_ram, download, tmp_dir, "mini_imagenet", download_dataset_miniimagenet)
+        super().__init__(mode, (images_size, images_size, 3), load_on_ram, download, tmp_dir, "mini_imagenet", download_dataset_miniimagenet, MiniImagenetDataset.URL)

@@ -12,6 +12,7 @@ class TestFlowers102Dataset(TestCase):
         self.dts_dir = "datasetstest_flowers102"
         if os.path.exists(self.dts_dir): shutil.rmtree(self.dts_dir)
         try:
+            Flowers102Dataset.URL = "https://github.com/fabian57fabian/prototypical-networks-few-shot-learning/releases/download/v0.0-unit-tests-dataset-mini_imagenet/flowers102.zip"
             self.dl = Flowers102Dataset(mode="train", load_on_ram=True, download=True, tmp_dir=self.dts_dir, images_size=10, seed=647473)
         except Exception as e:
             print("Unable to download/load 'flowers102'")
@@ -32,7 +33,7 @@ class TestFlowers102Dataset(TestCase):
                 assert len(os.listdir(os.path.join(p, ch))) > 0
 
     def test_getsample(self):
-        NC, NS, NQ = 20, 5, 6
+        NC, NS, NQ = 2, 2, 1
         start_time = datetime.now()
         sample = self.dl.GetSample(NC, NS, NQ)
         duration = (datetime.now() - start_time).total_seconds() * 1000
@@ -46,7 +47,7 @@ class TestFlowers102Dataset(TestCase):
     def test_download_dataset(self):
         _dir = self.tmp_downlaod_dir
         if os.path.exists(_dir): shutil.rmtree(_dir)
-        download_dataset_flowers102(_dir)
+        download_dataset_flowers102(_dir, "https://github.com/fabian57fabian/prototypical-networks-few-shot-learning/releases/download/v0.0-unit-tests-dataset-mini_imagenet/flowers102.zip")
         assert os.path.exists(_dir)
         train_dir = os.path.join(_dir, "train")
         val_dir = os.path.join(_dir, "val")

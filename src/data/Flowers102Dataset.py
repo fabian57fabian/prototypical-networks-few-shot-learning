@@ -1,3 +1,4 @@
+import logging
 import os
 import shutil
 import random
@@ -32,15 +33,17 @@ def postprocess_dataset(src_dir, dest_dir):
             cls = str(cls_int)
             _from = os.path.join(src, cls)
             _to = os.path.join(dest, cls)
-            shutil.move(_from, dest)
+            if not os.path.exists(_from):
+                logging.warning(f"Class {cls} not in flowers102 dataset. Skipping")
+            else:
+                shutil.move(_from, dest)
 
     move_this(train_cls, src_dir, path_dataset_train)
     move_this(val_cls, src_dir, path_dataset_val)
     move_this(test_cls, src_dir, path_dataset_test)
 
 
-def download_dataset_flowers102(dest_dir):
-    url = "https://github.com/fabian57fabian/prototypical-networks-few-shot-learning/releases/download/v0.3-dataset-flowers102/flowers102.zip"
+def download_dataset_flowers102(dest_dir, url):
     if not os.path.exists(dest_dir):
         os.mkdir(dest_dir)
     tmp_dest_dir = os.path.join(dest_dir, "tmp")
@@ -55,7 +58,8 @@ def download_dataset_flowers102(dest_dir):
 
 
 class Flowers102Dataset(AbstractDataset):
+    URL = "https://github.com/fabian57fabian/prototypical-networks-few-shot-learning/releases/download/v0.3-dataset-flowers102/flowers102.zip"
     def __init__(self, mode='train', load_on_ram=True, download=True,images_size=None, tmp_dir="datasets", seed=3840):
         if seed >= 0: random.seed(seed)
         images_size = 74 if images_size is None else images_size
-        super().__init__(mode, (images_size, images_size, 3), load_on_ram, download, tmp_dir,"flowers102", download_dataset_flowers102)
+        super().__init__(mode, (images_size, images_size, 3), load_on_ram, download, tmp_dir,"flowers102", download_dataset_flowers102, Flowers102Dataset.URL)

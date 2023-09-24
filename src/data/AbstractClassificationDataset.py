@@ -7,7 +7,7 @@ from PIL import Image
 
 
 class AbstractDataset:
-    def __init__(self, mode='train', data_shape=(84, 84, 3), load_on_ram=True, download=True, tmp_dir="datasets", dataset_name="dataset_YYY", download_function = None):
+    def __init__(self, mode='train', data_shape=(84, 84, 3), load_on_ram=True, download=True, tmp_dir="datasets", dataset_name="dataset_YYY", download_function = None, download_url = ""):
         assert mode in ['train', 'val', 'test'], "given mode should be train, val or test."
         self.IMAGE_SIZE = (data_shape[0], data_shape[1])
         self.IMAGE_CHANNELS = data_shape[2]
@@ -28,7 +28,7 @@ class AbstractDataset:
                 dataset_exists = True
         if download and not dataset_exists:
             print("Downloading dataset")
-            download_function(self.dts_dir)
+            download_function(self.dts_dir, download_url)
         self.classes = os.listdir(self.curr_dataset_folder)
         self.cache = None
         if self.load_on_ram:
