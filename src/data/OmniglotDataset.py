@@ -53,7 +53,7 @@ def postprocess_dataset(src_dir, dest_dir):
     postprocess_this_dir(test_alp, path_dataset_test)
 
 def download_dataset_omniglot(dest_dir):
-    url = "https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/releases/download/v0.2/omniglot.zip"
+    url = "https://github.com/fabian57fabian/prototypical-networks-few-shot-learning/releases/download/v0.2-dataset-omniglot/omniglot.zip"
     if not os.path.exists(dest_dir):
         os.mkdir(dest_dir)
     tmp_dest_dir = os.path.join(dest_dir, "tmp")

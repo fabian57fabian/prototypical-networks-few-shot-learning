@@ -4,7 +4,7 @@ from src.utils import download_file_from_url
 from src.data.AbstractClassificationDataset import AbstractDataset
 
 def download_dataset_miniimagenet(dest_dir):
-    url = "https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/releases/download/v0.1/mini_imagenet.zip"
+    url = "https://github.com/fabian57fabian/prototypical-networks-few-shot-learning/releases/download/v0.1-dataset-mini_imagenet/mini_imagenet.zip"
     if not os.path.exists(dest_dir):
         os.mkdir(dest_dir)
     download_file_from_url(url, dest_dir)

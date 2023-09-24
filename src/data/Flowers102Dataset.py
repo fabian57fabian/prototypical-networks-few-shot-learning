@@ -40,7 +40,7 @@ def postprocess_dataset(src_dir, dest_dir):
 
 
 def download_dataset_flowers102(dest_dir):
-    url = "https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/releases/download/v0.3/flowers102.zip"
+    url = "https://github.com/fabian57fabian/prototypical-networks-few-shot-learning/releases/download/v0.3-dataset-flowers102/flowers102.zip"
     if not os.path.exists(dest_dir):
         os.mkdir(dest_dir)
     tmp_dest_dir = os.path.join(dest_dir, "tmp")
