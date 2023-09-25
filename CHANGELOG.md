@@ -53,7 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - .gitignore for Pycharm projects
 - Paper
 - requirements.txt
-- Prototypical network (#aa2bc3fb)
+- Prototypical network (aa2bc3fba50defeb0f7d19e7d49c30523baecf40)
 
 ### Fixed
 
