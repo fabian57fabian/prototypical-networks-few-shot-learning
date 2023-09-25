@@ -164,6 +164,8 @@ This will perform predictions by printing out all classes based on images in _a_
 | mini_imagenet | (84, 84, 3)            | (batch, 1600)              | gpu / 1h43m                 |
 | omniglot | (28, 28, 1)            | (batch, 60)                | gpu / 2h32                  |
 | flowers102 | (74, 74, 3)            | (batch, 1024)              | gpu / 58m                   |
+| stanford_cars | (90, 90, 3)            | (batch, 1024)              | gpu / 1h52m                 |
+
 
 ### 1-shot vs few-shot
 
@@ -176,17 +178,19 @@ Then evaluation is performed in different n-ways and k-shots.
 | mini_imagenet | 68.20                                   | [63.62](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/blob/main/results/mini_imagenet/train_5shot.png) | 49.42                                   | [46.13](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/blob/main/results/mini_imagenet/train_1shot.png) |
 | omniglot      | 98.80                                   | [97.77](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/blob/main/results/omniglot/train_5shot.png)      | 98.8                                    | [91.93](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/blob/main/results/omniglot/train_1shot.png)      | 
 | flowers102    | /                                       | [84.48](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/blob/main/results/flowers102/train_5shot.png)    | /                                       | [56.08](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/blob/main/results/flowers102/train_1shot.png)    | 
+| stanford_cars | /                                       | [51.87](https://github.com/fabian57fabian/fewshot-learning-prototypical-networks/blob/main/results/stanford_cars/train_5shot.png) | /                                       | /                                                                                                                                 | 
 
 ### Euclidean vs cosine distances
 
 Cosine experiments were done on 5-way 5-shot configurations.
 Same results for similar 1-shot and 20-way trainings.
 
-| Dataset | Cosine<br><sup>(acc) | Euclidean<br><sup>(acc) |
-|---------|----------------------|-------------------------|
-| mini_imagenet | 22.36                | **63.62**               |
-| omniglot | 23.48                | **97.77**               |
-| flowers102 | 82.89                | **84.48**               |
+| Dataset       | Cosine<br><sup>(acc) | Euclidean<br><sup>(acc) |
+|---------------|---------------------|-------------------------|
+| mini_imagenet | 22.36               | **63.62**               |
+| omniglot      | 23.48               | **97.77**               |
+| flowers102    | 82.89               | **84.48**               |
+| stanford_cars | ____                | **51.87**               |
 
 
 </details>
