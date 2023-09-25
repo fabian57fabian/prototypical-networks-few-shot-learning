@@ -105,6 +105,10 @@ def init_savemodel(prefix="train") -> str:
 def save_model(model, training_dir, name):
     torch.save(model.state_dict(), os.path.join(training_dir, name))
 
+def load_model(model, path:str):
+    model.load_state_dict(torch.load(path))
+    model.eval()
+
 def meta_train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
           train_num_classes=30,
           test_num_class=5,
@@ -117,7 +121,8 @@ def meta_train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
           images_size=None,
           images_ch=None,
           save_each=5,
-          eval_each=1):
+          eval_each=1,
+          model_to_load=None) -> str:
     training_dir = init_savemodel()
     print(f"Writing to {training_dir}")
     writer = SummaryWriter(log_dir=training_dir)
@@ -125,8 +130,13 @@ def meta_train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
     train_loader, valid_loader, test_loader = loaders
     device = build_device(use_gpu)
     print(f"Creating Prototype model on {device}")
-    model = PrototypicalNetwork().to(device)
-    #print(model)
+    model = PrototypicalNetwork()
+    if model_to_load is not None:
+        if not os.path.exists(model_to_load):
+            raise Exception(f"Model path to load does not exist: {model_to_load}")
+        print(f"Loading model {model_to_load}")
+        load_model(model, model_to_load)
+    model = model.to(device)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=optim_step_size, gamma=optim_gamma)
@@ -211,6 +221,7 @@ def meta_train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
     duration = (datetime.datetime.now() - start_time)
     print(f"Training duration: {str(duration)}")
     print(f"Best val/acc {best_acc*100:.2f} on epoch {best_acc_ep}")
+    return training_dir
 
 def meta_test(model_path, episodes_per_epoch=100, dataset='mini_imagenet', use_gpu=False,
          test_num_query=15,

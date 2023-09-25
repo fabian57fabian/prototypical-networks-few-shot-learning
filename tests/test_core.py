@@ -140,6 +140,13 @@ class TestCore(TestCase):
                 assert "config.yaml" in files
                 shutil.rmtree(path_run)
 
+    def test_loading_model(self):
+        train_dir = meta_train("mini_imagenet", 1, True,
+                   train_num_classes=1, test_num_class=1, train_num_query=1, number_support=1,
+                   episodes_per_epoch=10, images_size=28, images_ch=1, model_to_load=self.model_to_use)
+        assert os.path.exists(train_dir)
+        assert os.path.exists(os.path.join(train_dir, "model_best.pt"))
+
     def test_meta_test(self):
         dataset_to_test_index = 1
 
