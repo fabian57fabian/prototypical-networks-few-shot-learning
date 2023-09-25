@@ -157,7 +157,11 @@ def meta_train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
         "opt_step_size": optim_step_size,
         "opt_gamma": optim_gamma,
         "distance_function": distance_function,
-        "save_each": save_each
+        "images_size": images_size,
+        "images_channels": images_ch,
+        "save_each": save_each,
+        "eval_each": eval_each,
+        "train_from": model_to_load if model_to_load is not None else ""
     }
     save_yaml_config(training_dir, config)
 
