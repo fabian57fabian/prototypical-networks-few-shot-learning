@@ -34,8 +34,8 @@ class TestCore(TestCase):
         self.base_datasets_meta_train = "datasets"
         os.mkdir(self.base_datasets_meta_train)
         custom_dts_name = "custom_1"
-        self.datasets_to_meta_learn = [custom_dts_name, "mini_imagenet", "omniglot", "flowers102"]
-        self.channels_to_meta_learn = [3, 3, 1, 3]
+        self.datasets_to_meta_learn = [custom_dts_name, "mini_imagenet", "omniglot", "flowers102", "stanford_cars"]
+        self.channels_to_meta_learn = [3, 3, 1, 3, 3]
         self.meta_train_images = 10
         self.meta_train_classes_num = 5
         for dataset, channels in zip(self.datasets_to_meta_learn, self.channels_to_meta_learn):
@@ -99,7 +99,11 @@ class TestCore(TestCase):
     def test_get_allowed_base_datasets_names(self):
         ad = get_allowed_base_datasets_names()
         assert type(ad) is list
-        assert len(ad) == 3
+        assert "mini_imagenet" in ad
+        assert "omniglot" in ad
+        assert "flowers102" in ad
+        assert "stanford_cars" in ad
+
 
     def test_meta_train(self):
         for distance_fn in ["cosine", "euclidean"]:

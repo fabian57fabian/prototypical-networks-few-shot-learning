@@ -52,6 +52,11 @@ We used 3 main classification datasets:
   - splits: 64 train, 16 val, 22 test (random seed for splits)
   - **NOT** Used in paper
   - ![](docs/images/flowers102_dataset.png)
+- **stanfors_cars**: a collection of 192 real-world cars classes as rgb images.
+  - total: 9999999
+  - splits: 60% train, 20% val, 30% test (random seed for splits)
+  - **NOT** Used in paper
+  - ![](docs/images/stanford_cars_dataset.png)
 </details>
 
 <details open>
@@ -77,7 +82,7 @@ python meta_train.py --dataset mini_imagenet \
                 --save-each 5
 ```
 
-Implemented datasets are [omniglot, mini_imagenet, flowers102]:
+Implemented datasets are [omniglot, mini_imagenet, flowers102, stanford_cars]:
 
 To **train** with your **own custom dataset**, set --dataset toy our dataset folder. 
 <br/>

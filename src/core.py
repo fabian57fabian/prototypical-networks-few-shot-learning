@@ -13,6 +13,7 @@ from src.prototypical_loss import prototypical_loss, euclidean_dist, cosine_dist
 from src.data.MiniImagenetDataset import MiniImagenetDataset
 from src.data.OmniglotDataset import OmniglotDataset
 from src.data.Flowers102Dataset import Flowers102Dataset
+from src.data.StanfordCarsDataset import StanfordCars
 from src.data.CustomDataset import CustomDataset
 from src.data.AbstractClassificationDataset import load_class_images, load_image
 
@@ -26,7 +27,7 @@ print(f"***** Few-shot Learning with proto nets. v{__version__} *****")
 
 
 def get_allowed_base_datasets_names() -> list:
-    return ["mini_imagenet", "omniglot", "flowers102"]
+    return ["mini_imagenet", "omniglot", "flowers102", "stanford_cars"]
 
 
 def build_dataloaders(dataset='mini_imagenet', size=None, channels=None, only_test=False):
@@ -54,6 +55,12 @@ def build_dataloaders(dataset='mini_imagenet', size=None, channels=None, only_te
         if only_test: return None, None, test_loader
         train_loader = CustomDataset(mode='train', load_on_ram=True, images_size=size, image_ch=channels, dataset_path=dataset)
         valid_loader = CustomDataset(mode='val', load_on_ram=True, images_size=size, image_ch=channels, dataset_path=dataset)
+        return train_loader, valid_loader, test_loader
+    elif dataset == 'stanford_cars':
+        test_loader = StanfordCars(mode='test', load_on_ram=True, download=True, images_size=size, tmp_dir="datasets")
+        if only_test: return None, None, test_loader
+        train_loader = StanfordCars(mode='train', load_on_ram=True, download=False, images_size=size, tmp_dir="datasets")
+        valid_loader = StanfordCars(mode='val', load_on_ram=True, download=False, images_size=size, tmp_dir="datasets")
         return train_loader, valid_loader, test_loader
     raise Exception("dataset unknown")
 
