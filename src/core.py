@@ -13,7 +13,7 @@ from src.prototypical_loss import prototypical_loss, euclidean_dist, cosine_dist
 from src.data.MiniImagenetDataset import MiniImagenetDataset
 from src.data.OmniglotDataset import OmniglotDataset
 from src.data.Flowers102Dataset import Flowers102Dataset
-from src.data.StanfordCarsDataset import StanfordCars
+from src.data.StanfordCarsDataset import StanfordCarsDataset
 from src.data.CustomDataset import CustomDataset
 from src.data.AbstractClassificationDataset import load_class_images, load_image
 
@@ -30,38 +30,46 @@ def get_allowed_base_datasets_names() -> list:
     return ["mini_imagenet", "omniglot", "flowers102", "stanford_cars"]
 
 
-def build_dataloaders(dataset='mini_imagenet', size=None, channels=None, only_test=False):
+def build_dataloaders_test(dataset='mini_imagenet', size=None, channels=None):
     if dataset == 'mini_imagenet':
-        # Loading datasets
         test_loader = MiniImagenetDataset(mode='test', load_on_ram=True, download=True, images_size=size, tmp_dir="datasets")
-        if only_test: return None, None, test_loader
-        train_loader = MiniImagenetDataset(mode='train', load_on_ram=True, download=False, images_size=size, tmp_dir="datasets")
-        valid_loader = MiniImagenetDataset(mode='val', load_on_ram=True, download=False, images_size=size, tmp_dir="datasets")
-        return train_loader, valid_loader, test_loader
+        return test_loader
     elif dataset == 'omniglot':
         test_loader = OmniglotDataset(mode='test', load_on_ram=True, download=True, images_size=size, tmp_dir="datasets")
-        if only_test: return None, None, test_loader
-        train_loader = OmniglotDataset(mode='train', load_on_ram=True, download=False, images_size=size, tmp_dir="datasets")
-        valid_loader = OmniglotDataset(mode='val', load_on_ram=True, download=False, images_size=size, tmp_dir="datasets")
-        return train_loader, valid_loader, test_loader
+        return test_loader
     elif dataset == 'flowers102':
         test_loader = Flowers102Dataset(mode='test', load_on_ram=True, download=True, images_size=size, tmp_dir="datasets")
-        if only_test: return None, None, test_loader
-        train_loader = Flowers102Dataset(mode='train', load_on_ram=True, download=False, images_size=size, tmp_dir="datasets")
-        valid_loader = Flowers102Dataset(mode='val', load_on_ram=True, download=False, images_size=size, tmp_dir="datasets")
-        return train_loader, valid_loader, test_loader
+        return test_loader
     elif os.path.exists(dataset):
         test_loader = CustomDataset(mode='test', load_on_ram=True, images_size=size, image_ch=channels, dataset_path=dataset)
-        if only_test: return None, None, test_loader
+        return test_loader
+    elif dataset == 'stanford_cars':
+        test_loader = StanfordCarsDataset(mode='test', load_on_ram=True, download=True, images_size=size, tmp_dir="datasets")
+        return test_loader
+    raise Exception("dataset unknown")
+
+
+def build_dataloaders(dataset='mini_imagenet', size=None, channels=None):
+    if dataset == 'mini_imagenet':
+        train_loader = MiniImagenetDataset(mode='train', load_on_ram=True, download=True, images_size=size, tmp_dir="datasets")
+        valid_loader = MiniImagenetDataset(mode='val', load_on_ram=True, download=False, images_size=size, tmp_dir="datasets")
+        return train_loader, valid_loader
+    elif dataset == 'omniglot':
+        train_loader = OmniglotDataset(mode='train', load_on_ram=True, download=True, images_size=size, tmp_dir="datasets")
+        valid_loader = OmniglotDataset(mode='val', load_on_ram=True, download=False, images_size=size, tmp_dir="datasets")
+        return train_loader, valid_loader
+    elif dataset == 'flowers102':
+        train_loader = Flowers102Dataset(mode='train', load_on_ram=True, download=True, images_size=size, tmp_dir="datasets")
+        valid_loader = Flowers102Dataset(mode='val', load_on_ram=True, download=False, images_size=size, tmp_dir="datasets")
+        return train_loader, valid_loader
+    elif os.path.exists(dataset):
         train_loader = CustomDataset(mode='train', load_on_ram=True, images_size=size, image_ch=channels, dataset_path=dataset)
         valid_loader = CustomDataset(mode='val', load_on_ram=True, images_size=size, image_ch=channels, dataset_path=dataset)
-        return train_loader, valid_loader, test_loader
+        return train_loader, valid_loader
     elif dataset == 'stanford_cars':
-        test_loader = StanfordCars(mode='test', load_on_ram=True, download=True, images_size=size, tmp_dir="datasets")
-        if only_test: return None, None, test_loader
-        train_loader = StanfordCars(mode='train', load_on_ram=True, download=False, images_size=size, tmp_dir="datasets")
-        valid_loader = StanfordCars(mode='val', load_on_ram=True, download=False, images_size=size, tmp_dir="datasets")
-        return train_loader, valid_loader, test_loader
+        train_loader = StanfordCarsDataset(mode='train', load_on_ram=True, download=True, images_size=size, tmp_dir="datasets")
+        valid_loader = StanfordCarsDataset(mode='val', load_on_ram=True, download=False, images_size=size, tmp_dir="datasets")
+        return train_loader, valid_loader
     raise Exception("dataset unknown")
 
 
@@ -127,9 +135,8 @@ def meta_train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
     print(f"Writing to {training_dir}")
     writer = SummaryWriter(log_dir=training_dir)
 
-    print("Loading data")
-    loaders = build_dataloaders(dataset, images_size, images_ch)
-    train_loader, valid_loader, test_loader = loaders
+    print("Building DataLoaders")
+    train_loader, valid_loader = build_dataloaders(dataset, images_size, images_ch)
     device = build_device(use_gpu)
 
     print(f"Creating Prototype model on {device}")
@@ -240,8 +247,8 @@ def meta_test(model_path, episodes_per_epoch=100, dataset='mini_imagenet', use_g
           distance_function="euclidean",
           images_size=None,
           images_ch=None) -> float:
-    print("Loading data")
-    _, _, test_loader = build_dataloaders(dataset, images_size, images_ch, only_test=True)
+    print("Building DataLoaders")
+    test_loader = build_dataloaders_test(dataset, images_size, images_ch)
     device = build_device(use_gpu)
 
     print(f"Creating Prototype model on {device} from {model_path}")

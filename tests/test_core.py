@@ -4,7 +4,12 @@ import shutil
 import numpy as np
 from PIL import Image
 from unittest import TestCase
-from src.core import cosine_dist, euclidean_dist, init_savemodel, build_device, build_distance_function, get_allowed_base_datasets_names, build_dataloaders, meta_train, meta_test, learn, predict
+from src.core import cosine_dist, euclidean_dist, init_savemodel, build_device, build_distance_function, get_allowed_base_datasets_names, build_dataloaders, build_dataloaders_test, meta_train, meta_test, learn, predict
+from src.data.Flowers102Dataset import Flowers102Dataset
+from src.data.MiniImagenetDataset import MiniImagenetDataset
+from src.data.OmniglotDataset import OmniglotDataset
+from src.data.StanfordCarsDataset import StanfordCarsDataset
+from src.data.CustomDataset import CustomDataset
 
 
 class TestCore(TestCase):
@@ -199,10 +204,39 @@ class TestCore(TestCase):
             assert classification in self.classes_of_predict
             assert cls == im_path
 
-    def test_build_dataloaders(self):
+    def test_build_dataloaders_unknown(self):
         with self.assertRaises(Exception) as context:
             build_dataloaders(str(uuid.uuid4()), 28, 3)
         assert "dataset unknown" in context.exception.args
+
+    def test_build_dataloaders_test_unknown(self):
+        with self.assertRaises(Exception) as context:
+            build_dataloaders_test(str(uuid.uuid4()), 28, 3)
+        assert "dataset unknown" in context.exception.args
+
+    def test_build_dataloaders_test_omniglot(self):
+        OmniglotDataset.URL = "https://github.com/fabian57fabian/prototypical-networks-few-shot-learning/releases/download/v0.0-unit-tests-dataset-mini_imagenet/omniglot.zip"
+        dl = build_dataloaders_test("omniglot", 28, 1)
+        assert dl is not None
+        assert type(dl) == OmniglotDataset
+
+    def test_build_dataloaders_test_mini_imagenet(self):
+        MiniImagenetDataset.URL = "https://github.com/fabian57fabian/prototypical-networks-few-shot-learning/releases/download/v0.0-unit-tests-dataset-mini_imagenet/mini_imagenet.zip"
+        dl = build_dataloaders_test("mini_imagenet", 28, 3)
+        assert dl is not None
+        assert type(dl) == MiniImagenetDataset
+
+    def test_build_dataloaders_test_flowers102(self):
+        Flowers102Dataset.URL = "https://github.com/fabian57fabian/prototypical-networks-few-shot-learning/releases/download/v0.0-unit-tests-dataset-mini_imagenet/flowers102.zip"
+        dl = build_dataloaders_test("flowers102", 10, 3)
+        assert dl is not None
+        assert type(dl) == Flowers102Dataset
+
+    def test_build_dataloaders_test_stanford_cars(self):
+        StanfordCarsDataset.URL = "https://github.com/fabian57fabian/prototypical-networks-few-shot-learning/releases/download/v0.0-unit-tests-dataset-mini_imagenet/stanford_cars.tar.xz"
+        dl = build_dataloaders_test("stanford_cars", 10, 3)
+        assert dl is not None
+        assert type(dl) == StanfordCarsDataset
 
     def test_init_savemodel(self):
         prefix = "wow"

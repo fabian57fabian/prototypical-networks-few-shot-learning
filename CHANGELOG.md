@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Readme description
+- Datasets loading between meta train/val and meta test
 
 ### Removed
 

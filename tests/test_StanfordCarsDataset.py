@@ -3,7 +3,7 @@ import shutil
 from datetime import datetime
 
 from unittest import TestCase
-from src.data.StanfordCarsDataset import StanfordCars, download_dataset_stanford_cars
+from src.data.StanfordCarsDataset import StanfordCarsDataset, download_dataset_stanford_cars
 
 class TestStanfordCars(TestCase):
 
@@ -12,8 +12,8 @@ class TestStanfordCars(TestCase):
         self.dts_dir = "datasetstest_stanford_cars"
         if os.path.exists(self.dts_dir): shutil.rmtree(self.dts_dir)
 
-        StanfordCars.URL = "https://github.com/fabian57fabian/prototypical-networks-few-shot-learning/releases/download/v0.0-unit-tests-dataset-mini_imagenet/stanford_cars.tar.xz"
-        self.dl = StanfordCars(mode="train", load_on_ram=True, download=True, tmp_dir=self.dts_dir, images_size=10, seed=647473)
+        StanfordCarsDataset.URL = "https://github.com/fabian57fabian/prototypical-networks-few-shot-learning/releases/download/v0.0-unit-tests-dataset-mini_imagenet/stanford_cars.tar.xz"
+        self.dl = StanfordCarsDataset(mode="train", load_on_ram=True, download=True, tmp_dir=self.dts_dir, images_size=10, seed=647473)
 
     def tearDown(self) -> None:
         if os.path.exists(self.dts_dir): shutil.rmtree(self.dts_dir)

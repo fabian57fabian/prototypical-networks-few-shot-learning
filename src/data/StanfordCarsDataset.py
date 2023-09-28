@@ -60,9 +60,9 @@ def download_dataset_stanford_cars(dest_dir, url):
     shutil.rmtree(tmp_dest_dir)
 
 
-class StanfordCars(AbstractDataset):
+class StanfordCarsDataset(AbstractDataset):
     URL = "https://github.com/fabian57fabian/prototypical-networks-few-shot-learning/releases/download/v0.4-dataset-stanford-cars/stanford_cars.tar.xz"
     def __init__(self, mode='train', load_on_ram=True, download=True,images_size=None, tmp_dir="datasets", seed=3840):
         if seed >= 0: random.seed(seed)
         images_size = 74 if images_size is None else images_size
-        super().__init__(mode, (images_size, images_size, 3), load_on_ram, download, tmp_dir,"stanford_cars", download_dataset_stanford_cars, StanfordCars.URL)
+        super().__init__(mode, (images_size, images_size, 3), load_on_ram, download, tmp_dir,"stanford_cars", download_dataset_stanford_cars, StanfordCarsDataset.URL)
