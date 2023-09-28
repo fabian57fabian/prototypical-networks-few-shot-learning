@@ -126,9 +126,12 @@ def meta_train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
     training_dir = init_savemodel()
     print(f"Writing to {training_dir}")
     writer = SummaryWriter(log_dir=training_dir)
+
+    print("Loading data")
     loaders = build_dataloaders(dataset, images_size, images_ch)
     train_loader, valid_loader, test_loader = loaders
     device = build_device(use_gpu)
+
     print(f"Creating Prototype model on {device}")
     model = PrototypicalNetwork()
     if model_to_load is not None:
@@ -138,6 +141,7 @@ def meta_train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
         load_model(model, model_to_load)
     model = model.to(device)
 
+    # Optimizer, lr_scheduler
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=optim_step_size, gamma=optim_gamma)
 
@@ -236,8 +240,10 @@ def meta_test(model_path, episodes_per_epoch=100, dataset='mini_imagenet', use_g
           distance_function="euclidean",
           images_size=None,
           images_ch=None) -> float:
+    print("Loading data")
     _, _, test_loader = build_dataloaders(dataset, images_size, images_ch, only_test=True)
     device = build_device(use_gpu)
+
     print(f"Creating Prototype model on {device} from {model_path}")
     model = PrototypicalNetwork().to(device)
     model.load_state_dict(torch.load(model_path))
@@ -286,10 +292,8 @@ def predict(model_path: str, centroids_path: str, images_path: list, images_size
     model = PrototypicalNetwork().to(device)
     model.load_state_dict(torch.load(model_path))
 
+    print("Loading data")
     prototypes, classes = load_centroids(centroids_path)
-
-    # TODO: optimize with batch size
-
     size = (images_size, images_size)
 
     model.eval()
