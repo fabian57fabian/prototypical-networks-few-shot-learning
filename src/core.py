@@ -195,6 +195,8 @@ def meta_train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
         writer.add_scalar("Loss/train", loss_mean, epoch)
         writer.add_scalar("Acc/train", acc_mean, epoch)
         print(f'Ep {epoch}: Avg Train loss: {loss_mean}, Avg Train acc: {acc_mean}')
+        curr_lr = lr_scheduler.get_last_lr()[-1]
+        writer.add_scalar("lr", curr_lr, epoch)
         lr_scheduler.step()
 
         # Val
