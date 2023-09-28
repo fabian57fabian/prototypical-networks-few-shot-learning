@@ -19,16 +19,13 @@ from src.data.CustomDataset import CustomDataset
 from src.data.AbstractClassificationDataset import load_class_images, load_image
 
 from src.data.centroids import load_centroids, save_centroids
+from src.utils import get_torch_device
 from src import __version__
 
 print(f"***** Few-shot Learning with proto nets. v{__version__} *****")
 
 # example train algo from https://github.com/pytorch/examples/blob/main/mnist/main.py
 # Loading datasets from https://github.com/learnables/learn2learn/tree/master#learning-domains
-
-
-def get_allowed_base_datasets_names() -> list:
-    return ["mini_imagenet", "omniglot", "flowers102", "stanford_cars"]
 
 
 def build_dataloaders_test(dataset='mini_imagenet', size=None, channels=None):
@@ -74,16 +71,6 @@ def build_dataloaders(dataset='mini_imagenet', size=None, channels=None):
     raise Exception("dataset unknown")
 
 
-def build_device(use_gpu=False):
-    device = torch.device("cpu")
-    if use_gpu:
-        if torch.cuda.is_available():
-            device = torch.device("cuda:0")
-        else:
-            print("WWARN: Unable to set device to GPU because not available. Fallback to 'cpu'")
-    return device
-
-
 def build_distance_function(distance_function: str):
     if distance_function not in ["euclidean", "cosine"]:
         raise Exception("Wrong distance function supplied")
@@ -118,97 +105,61 @@ def load_model(model, path:str):
     model.load_state_dict(torch.load(path))
     model.eval()
 
-def meta_train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
-          train_num_classes=30,
-          test_num_class=5,
-          train_num_query=15,
-          number_support=5,
-          episodes_per_epoch=50,
-          optim_step_size=20,
-          optim_gamma = 0.5,
-          distance_function="euclidean",
-          images_size=None,
-          images_ch=None,
-          save_each=5,
-          eval_each=1,
-          es_count=100,
-          es_delta=.001,
-          model_to_load=None) -> str:
+def meta_train(cfg: dict) -> str:
     training_dir = init_savemodel()
     print(f"Writing to {training_dir}")
     writer = SummaryWriter(log_dir=training_dir)
 
     print("Building DataLoaders")
-    train_loader, valid_loader = build_dataloaders(dataset, images_size, images_ch)
-    device = build_device(use_gpu)
+    train_loader, valid_loader = build_dataloaders(cfg["data"], cfg["imgsz"], cfg["channels"])
+    device = get_torch_device(cfg["device"])
 
     print(f"Creating Prototype model on {device}")
     model = PrototypicalNetwork()
-    if model_to_load is not None:
-        if not os.path.exists(model_to_load):
-            raise Exception(f"Model path to load does not exist: {model_to_load}")
-        print(f"Loading model {model_to_load}")
-        load_model(model, model_to_load)
+    if cfg["model"] is not None:
+        if not os.path.exists(cfg["model"]):
+            raise Exception(f"Model path to load does not exist: {cfg['model']}")
+        print(f"Loading model {cfg['model']}")
+        load_model(model, cfg["model"])
     model = model.to(device)
 
     # Optimizer, lr_scheduler
-    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-    lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=optim_step_size, gamma=optim_gamma)
-    early_stopping = EarlyStopping(patience=es_count, delta=es_delta)
+    optimizer = torch.optim.Adam(model.parameters(), lr=cfg['adam_lr'])
+    lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=cfg['adam_step'], gamma=cfg['adam_gamma'])
+    # Callbacks
+    early_stopping = EarlyStopping(patience=cfg['patience'], delta=cfg['patience_delta'])
 
-    distance_fn = build_distance_function(distance_function)
+    distance_fn = build_distance_function(cfg['metric'])
 
     # Save config
-    config = {
-        "dataset": dataset,
-        "epochs": epochs,
-        "gpu": use_gpu,
-        "adam_lr": lr,
-        "NC_train": train_num_classes,
-        "NQ_train": train_num_query,
-        "NC_valid": test_num_class,
-        "NS": number_support,
-        "ep_per_epoch": episodes_per_epoch,
-        "opt_step_size": optim_step_size,
-        "opt_gamma": optim_gamma,
-        "distance_function": distance_function,
-        "images_size": images_size,
-        "images_channels": images_ch,
-        "save_each": save_each,
-        "eval_each": eval_each,
-        "early_stopping_count": es_count,
-        "early_stopping_delta": es_delta,
-        "train_from": model_to_load if model_to_load is not None else ""
-    }
-    save_yaml_config(training_dir, config)
+    save_yaml_config(training_dir, cfg)
 
     train_loss = []
     train_acc = []
-    val_loss = []
-    val_acc = []
     best_acc = -1
     best_acc_ep = -1
     start_time = datetime.datetime.now()
 
     print(f"Startring training at {str(start_time)}")
-    for epoch in range(epochs + 1):
+    NC, NS, NQ = cfg['num_way'], cfg['shot'], cfg['query']
+    for epoch in range(cfg['episodes'] + 1):
         model.train()
         # Train
-        for i in tqdm(range(episodes_per_epoch), total=episodes_per_epoch): # should be enough to cover batch*100 >= dataset_size
-            batch = train_loader.GetSample(train_num_classes, number_support, train_num_query)
+        for i in tqdm(range(cfg['iterations']), total=cfg['iterations']): # should be enough to cover batch*100 >= dataset_size
+            batch = train_loader.GetSample(NC, NS, NQ)
             optimizer.zero_grad()
             x, y = batch
             x = x.to(device)
             y = y.to(device)
             x = model(x)
-            loss, acc = prototypical_loss(x, y, number_support, train_num_classes, distance_fn)
+            loss, acc = prototypical_loss(x, y, NS, NC, distance_fn)
             loss.backward()
             optimizer.step()
             train_loss.append(loss.item())
             train_acc.append(acc.item())
-        if epoch % save_each == 0:
+        if cfg['save_period'] > 0 and epoch % cfg['save_period'] == 0:
             save_model(model, training_dir, f"model_{epoch}.pt")
-        loss_mean, acc_mean = np.mean(train_loss[-episodes_per_epoch:]),np.mean(train_acc[-episodes_per_epoch:])
+        loss_mean, acc_mean = np.mean(train_loss[-cfg['iterations']:]),np.mean(train_acc[-cfg['iterations']:])
         writer.add_scalar("Loss/train", loss_mean, epoch)
         writer.add_scalar("Acc/train", acc_mean, epoch)
         print(f'Ep {epoch}: Avg Train loss: {loss_mean}, Avg Train acc: {acc_mean}')
@@ -217,20 +168,8 @@ def meta_train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
         lr_scheduler.step()
 
         # Val
-        if eval_each > 0 and epoch % eval_each == 0:
-            model.eval()
-            with torch.no_grad():
-                for i in tqdm(range(episodes_per_epoch), total=episodes_per_epoch):
-                    batch = valid_loader.GetSample(test_num_class, number_support, train_num_query)
-                    x, y = batch
-                    x = x.to(device)
-                    y = y.to(device)
-                    x = model(x)
-                    loss, acc = prototypical_loss(x, y, number_support, test_num_class, distance_fn)
-                    val_loss.append(loss.item())
-                    val_acc.append(acc.item())
-                avg_loss = np.mean(val_loss[-episodes_per_epoch:])
-                avg_acc = np.mean(val_acc[-episodes_per_epoch:])
+        if cfg['eval_each'] > 0 and epoch % cfg['eval_each'] == 0:
+            avg_loss, avg_acc = evaluate(cfg, model, valid_loader, device, distance_fn)
             writer.add_scalar("Loss/val", avg_loss, epoch)
             writer.add_scalar("Acc/val", avg_acc, epoch)
             print(f"Avg Val Loss: {avg_loss}, Avg Val Acc: {avg_acc}")
@@ -250,68 +189,72 @@ def meta_train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
     print(f"Best val/acc {best_acc*100:.2f} on epoch {best_acc_ep}")
     return training_dir
 
-def meta_test(model_path, episodes_per_epoch=100, dataset='mini_imagenet', use_gpu=False,
-         test_num_query=15,
-          test_num_class=5,
-          number_support=5,
-          distance_function="euclidean",
-          images_size=None,
-          images_ch=None) -> float:
-    print("Building DataLoaders")
-    test_loader = build_dataloaders_test(dataset, images_size, images_ch)
-    device = build_device(use_gpu)
 
-    print(f"Creating Prototype model on {device} from {model_path}")
-    model = PrototypicalNetwork().to(device)
-    model.load_state_dict(torch.load(model_path))
-
-    distance_fn = build_distance_function(distance_function)
-
-    val_acc = []
-
+def evaluate(cfg, model, data_loader, device, distance_fn):
+    NC, NS, NQ = cfg['val_num_way'], cfg['shot'], cfg['query']
+    losses, accs = [], []
+    print("Starting validation")
     model.eval()
     with torch.no_grad():
-        for i in tqdm(range(episodes_per_epoch), total=episodes_per_epoch):
-            batch = test_loader.GetSample(test_num_class, number_support, test_num_query)
+        for i in tqdm(range(cfg['iterations']), total=cfg['iterations']):
+            batch = data_loader.GetSample(NC, NS, NQ)
             x, y = batch
             x = x.to(device)
             y = y.to(device)
             x = model(x)
-            _, acc = prototypical_loss(x, y, number_support, test_num_class, distance_fn)
-            val_acc.append(acc.item())
-        avg_acc = np.mean(val_acc[-episodes_per_epoch:])
+            loss, acc = prototypical_loss(x, y, NS, NC, distance_fn)
+            losses.append(loss.item())
+            accs.append(acc.item())
+        avg_loss = np.mean(losses)
+        avg_acc = np.mean(accs)
+    return avg_loss, avg_acc
+
+def meta_test(cfg) -> float:
+    print("Building DataLoaders")
+    test_loader = build_dataloaders_test(cfg["data"], cfg["imgsz"], cfg["channels"])
+    device = get_torch_device(cfg["device"])
+
+    print(f"Creating Prototype model on {device} from {cfg['model']}")
+    model = PrototypicalNetwork().to(device)
+    model.load_state_dict(torch.load(cfg['model']))
+
+    distance_fn = build_distance_function(cfg['metric'])
+
+    _, avg_acc = evaluate(cfg, model, test_loader, device, distance_fn)
     print(f"Avg Test Acc: {avg_acc}")
     return float(avg_acc)
 
 
-def learn(model_path: str, data_path: str, images_size=None, images_ch=None, use_gpu=False):
-    device = build_device(use_gpu)
-    print(f"Creating Prototype model on {device} from {model_path}")
+def learn(cfg):
+    device = get_torch_device(cfg["device"])
+    print(f"Creating Prototype model on {device} from {cfg['model']}")
     model = PrototypicalNetwork().to(device)
-    model.load_state_dict(torch.load(model_path))
+    model.load_state_dict(torch.load(cfg['model']))
 
     out_dir = init_savemodel("centroids")
 
     model.eval()
     with torch.no_grad():
-        classes = list(os.listdir(data_path))
+        classes = list(os.listdir(cfg['data']))
         for cl in tqdm(classes, total=len(classes)):
-            class_samples = load_class_images(os.path.join(data_path, cl), (images_size, images_size), images_ch)
+            class_samples = load_class_images(os.path.join(cfg['data'], cl), (cfg['imgsz'], cfg['imgsz']), cfg['channels'])
             class_samples = class_samples.to(device)
             embeddings = model(class_samples)
             centroids = embeddings.mean(dim=0)
             save_centroids(os.path.join(out_dir, cl), centroids.to('cpu'))
     print(f"Deployed to {out_dir}")
 
-def predict(model_path: str, centroids_path: str, images_path: list, images_size=None, batch_size=4, use_gpu=False) -> list:
-    device = build_device(use_gpu)
-    print(f"Creating Prototype model on {device} from {model_path}")
+def predict(cfg) -> list:
+    device = get_torch_device(cfg["device"])
+    print(f"Creating Prototype model on {device} from {cfg['model']}")
     model = PrototypicalNetwork().to(device)
-    model.load_state_dict(torch.load(model_path))
+    model.load_state_dict(torch.load(cfg['model']))
 
     print("Loading data")
-    prototypes, classes = load_centroids(centroids_path)
-    size = (images_size, images_size)
+    prototypes, classes = load_centroids(cfg['centroids'])
+    size = (cfg['imgsz'], cfg['imgsz'])
+    batch_size = 4  # set to speed up
+    images_path = [cfg['data']] if os.path.isfile(cfg['data']) else [os.path.join(cfg['data'], f) for f in os.listdir(cfg['data'])]
 
     model.eval()
     results = []
@@ -319,6 +262,7 @@ def predict(model_path: str, centroids_path: str, images_path: list, images_size
         i = 0
         while i < len(images_path):
             batch = []
+            images = []
             images = []
             for j in range(batch_size):
                 if i+j >= len(images_path): break

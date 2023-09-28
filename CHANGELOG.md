@@ -5,9 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
-
-## [1.1.0](https://github.com/fabian57fabian/prototypical-networks-few-shot-learning) - 2023-09-25
+# [1.1.0](https://github.com/fabian57fabian/prototypical-networks-few-shot-learning/releases/tag/v1.0.0) - 2023-09-28
 
 ### Added
 
@@ -16,15 +14,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changelog
 - Learning rate to tensorboard summary
 - Early Stopping with count and delta
+- defaults.yaml file with all configurations according to ultralytics
+- entrypoint in src
+- release
 
 ### Fixed
 
 - Remaining hyperparams to yaml config file
+- tests for default and entrypoint
 
 ### Changed
 
 - Readme description
 - Datasets loading between meta train/val and meta test
+- meta_train, meta_test, learn_centroids, predict into entrypoint
+- get_allowed_datasets into ALLOWED_BASE_DATASETS in init
+- argument names from ultralytics
+- version to 1.1.0
 
 ### Removed
 

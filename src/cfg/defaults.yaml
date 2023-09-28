@@ -1,0 +1,32 @@
+# Few-shot learning
+# Inspòider by ultralytics https://github.com/ultralytics/ultralytics/blob/main/ultralytics/cfg/default.yaml
+# Default meta-tran/val, meta-test hyperparams
+
+mode: train # (str) mode, i.e. train, val, test, learn_centroids, predict
+
+# Train settings -------------------------------------------------------------------------------------------------------
+data: mini_imagenet  # (str) dataset to use, choiches=[mini_imagenet, omniglot, flowers102, stanford_cars]
+# or path for a Custom Dataset
+model: null  # (str) model to load and start training
+device: cpu  # (int | str | list, optional) device to run on, i.e. cuda device=0 or device=0,1,2,3 or device=cpu
+episodes: 100  # (int) number of episodes to meta-train for
+num_way: 10 # (int)
+shot: 5 # (int)
+query: 10 # (int)
+iterations: 100  #(int) iterations to meta-train on specific task
+adam_lr: 0.001  #(float)
+adam_step: 20  #(int)
+adam_gamma: 0.5  # (float)
+metric: euclidean  # ( euclidean | cosine )
+imgsz: 64  # (int,optional)
+channels: 3  # (int,optional)
+save_period: -1 # (int) Save checkpoint every x epochs (disabled if < 1)
+patience: 50  # (int) epochs to wait for no observable improvement for early stopping of training (validation loss)
+patience_delta: 0  # (float) delta value for patience
+
+# Eval settings --------------------------------------------------------------------------------------------------------
+val_num_way: 5 # (int)
+eval_each: 1  # (int)
+
+# Predict
+centroids: centroids_0 # (str) path to centroids dir
