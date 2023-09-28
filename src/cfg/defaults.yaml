@@ -10,23 +10,23 @@ data: mini_imagenet  # (str) dataset to use, choiches=[mini_imagenet, omniglot, 
 model: null  # (str) model to load and start training
 device: cpu  # (int | str | list, optional) device to run on, i.e. cuda device=0 or device=0,1,2,3 or device=cpu
 episodes: 100  # (int) number of episodes to meta-train for
-num_way: 10 # (int)
-shot: 5 # (int)
-query: 10 # (int)
+num_way: 10 # (int) Number of classes to use on training
+shot: 5 # (int) Number of examples to use on training as support
+query: 10 # (int)Number of examples to use on training as query
 iterations: 100  #(int) iterations to meta-train on specific task
-adam_lr: 0.001  #(float)
-adam_step: 20  #(int)
-adam_gamma: 0.5  # (float)
-metric: euclidean  # ( euclidean | cosine )
-imgsz: 64  # (int,optional)
-channels: 3  # (int,optional)
-save_period: -1 # (int) Save checkpoint every x epochs (disabled if < 1)
-patience: 50  # (int) epochs to wait for no observable improvement for early stopping of training (validation loss)
+adam_lr: 0.001  #(float) learning rate for adam optimizer
+adam_step: 20  #(int) step size for adam optimizer
+adam_gamma: 0.5  # (float) step gamma for adam optimizer
+metric: euclidean  # ( euclidean | cosine ) metric to use during loss distance computation
+imgsz: 64  # (int,optional) input (square) size
+channels: 3  # (int,optional) input channegls
+save_period: -1 # (int) Save checkpoint every x episodes (disabled if < 1)
+patience: 50  # (int) episodes to wait for no observable improvement for early stopping of training (validation loss)
 patience_delta: 0  # (float) delta value for patience
+eval_each: 1  # (int) Evaluate each X episodes
 
 # Eval settings --------------------------------------------------------------------------------------------------------
-val_num_way: 5 # (int)
-eval_each: 1  # (int)
+val_num_way: 5 # (int) Number of classes to use on evaluation
 
 # Predict
 centroids: centroids_0 # (str) path to centroids dir
