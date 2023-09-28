@@ -67,19 +67,21 @@ The starter script is **meta_train.py** that has all necessary params to meta-tr
 To replicate the results, launch this training (writes to runs/train_X):
 
 ```bash
-python meta_train.py --dataset mini_imagenet \
-                --epochs 200 \
-                --gpu \
-                --train-num-class 30 \
-                --train-num-query 15 \
-                --number-support 5 \
-                --val-num-class 5 \
-                --episodes-per-epoch 100 \
+python meta_train.py --data mini_imagenet \
+                --episodes 200 \
+                --device cuda \
+                --num-way 30 \
+                --query 15 \
+                --shot 5 \
+                --val-num-way 5 \
+                --iterations 100 \
                 --adam-lr 0.001 \
-                --opt-step-size 20 \
-                --opt-gamma 0.5 \
-                --distance-function "euclidean" \
-                --save-each 5
+                --adam-step 20 \
+                --adam-gamma 0.5 \
+                --metric "euclidean" \
+                --save-period 5 \
+                --patience 10 \
+                --patience-delta 0.01
 ```
 
 Implemented datasets are [omniglot, mini_imagenet, flowers102, stanford_cars]:
@@ -117,13 +119,13 @@ To meta-test, use **meta_test.py** script:
 
 ```bash
 python meta_test.py --model "your_model_or_pretrained.py" \
-                --dataset mini_imagenet \
-                --episodes-per-epoch 100 \
-                --gpu \
-                --test-num-class 15 \
-                --test-num-query 15 \
-                --number-support 5 \
-                --distance-function "euclidean"
+                --data mini_imagenet \
+                --iterations 100 \
+                --device cuda \
+                --val-num-way 15 \
+                --query 15 \
+                --shot 5 \
+                --metric "euclidean"
 ```
 
 To learn centroids for new data, use **learn_centroids.py** script (writes to runs/centroids_Y):
@@ -131,9 +133,9 @@ To learn centroids for new data, use **learn_centroids.py** script (writes to ru
 ```bash
 python learn_centroids.py --model "your_model_or_pretrained.py" \
                 --data your_folder_with_classes_of_images \
-                --image-size 64 \
-                --image-ch 3 \
-                --gpu
+                --imgsz 64 \
+                --channels 3 \
+                --device cuda
 ```
 
 This will take all classes inside _your_folder_with_classes_of_images_ dir and calculate centroids for classification task.
@@ -144,10 +146,9 @@ To use centroids for classification on new images, use **predict.py** script (ou
 ```bash
 python predict.py --model "your_model_or_pretrained.py" \
                 --centroids runs/centroids_0 \
-                --images-path a_path_with_new_images \
-                --image-size 64 \
-                --batch-size 4 \
-                --gpu
+                --data a_path_with_new_images \
+                --imgsz 64 \
+                --device cuda
 ```
 
 This will perform predictions by printing out all classes based on images in _a_path_with_new_images_ .
