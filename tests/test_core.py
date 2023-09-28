@@ -130,11 +130,13 @@ class TestCore(TestCase):
                 image_ch = ch
                 save_each = 1
                 eval_each = 2
+                es_count = 50
+                es_delta=0
 
                 meta_train(dataset, epochs, gpu, adam_lr,
                            train_num_class, val_num_class, train_num_query, number_support,
                            episodes_per_epoch, opt_step_size, opt_gamma, distance_function,
-                           image_size, image_ch, save_each, eval_each)
+                           image_size, image_ch, save_each, eval_each, es_count, es_delta)
                 assert os.path.exists("runs")
                 path_run = f"runs/train_0"
                 assert os.path.exists(path_run), f"Run not found in {path_run}"

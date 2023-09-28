@@ -21,6 +21,8 @@ if __name__ == '__main__':
     parser.add_argument('--distance-function', type=str, default="euclidean", choices=["euclidean", "cosine"], help='Distance function.')
     parser.add_argument('--save-each', type=int, default=5, help='Save model each N epochs, default 5')
     parser.add_argument('--eval-each', type=int, default=1, help='Evaluate each X epochs, default 1.')
+    parser.add_argument('--early-stop-count', type=int, default=-1, help='Execute early stopping after COUNT epochs. default -1.')
+    parser.add_argument('--early-stop-delta', type=float, default=0.0, help='Early stopping delta value for score change, default 0.')
     parser.add_argument('--load-model', type=str, default=None, help='Start training from existing model')
     args = parser.parse_args()
 
@@ -33,4 +35,5 @@ if __name__ == '__main__':
 
     meta_train(dataset, args.epochs, args.gpu, args.adam_lr,
           args.train_num_class, args.val_num_class, args.train_num_query, args.number_support,
-          args.episodes_per_epoch, args.opt_step_size, args.opt_gamma, args.distance_function, args.image_size, args.image_ch, args.save_each, args.eval_each, args.load_model)
+          args.episodes_per_epoch, args.opt_step_size, args.opt_gamma, args.distance_function, args.image_size, args.image_ch, args.save_each, args.eval_each,
+          args.early_stop_count, args.early_stop_delta, args.load_model)

@@ -15,10 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Model loading in meta-train
 - Changelog
 - Learning rate to tensorboard summary
+- Early Stopping with count and delta
 
 ### Fixed
 
-- Added remaining hyperparams to yaml config file
+- Remaining hyperparams to yaml config file
 
 ### Changed
 

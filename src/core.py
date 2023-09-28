@@ -8,6 +8,7 @@ import numpy as np
 import yaml
 from tqdm import tqdm
 
+from src.EarlyStopping import EarlyStopping
 from src.prototypical_net import PrototypicalNetwork
 from src.prototypical_loss import prototypical_loss, euclidean_dist, cosine_dist
 from src.data.MiniImagenetDataset import MiniImagenetDataset
@@ -130,6 +131,8 @@ def meta_train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
           images_ch=None,
           save_each=5,
           eval_each=1,
+          es_count=100,
+          es_delta=.001,
           model_to_load=None) -> str:
     training_dir = init_savemodel()
     print(f"Writing to {training_dir}")
@@ -151,6 +154,7 @@ def meta_train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
     # Optimizer, lr_scheduler
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=optim_step_size, gamma=optim_gamma)
+    early_stopping = EarlyStopping(patience=es_count, delta=es_delta)
 
     distance_fn = build_distance_function(distance_function)
 
@@ -172,6 +176,8 @@ def meta_train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
         "images_channels": images_ch,
         "save_each": save_each,
         "eval_each": eval_each,
+        "early_stopping_count": es_count,
+        "early_stopping_delta": es_delta,
         "train_from": model_to_load if model_to_load is not None else ""
     }
     save_yaml_config(training_dir, config)
@@ -232,6 +238,10 @@ def meta_train(dataset='mini_imagenet', epochs=300, use_gpu=False, lr=0.001,
                 save_model(model, training_dir, f"model_best.pt")
                 best_acc = avg_acc
                 best_acc_ep = epoch
+            early_stopping(avg_loss)
+        if early_stopping.early_stop:
+            print("Stopping due to EarlyStopping")
+            break
 
     writer.flush()
     writer.close()
