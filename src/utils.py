@@ -38,7 +38,7 @@ def get_torch_device(device) -> torch.device:
         return device
     if device.startswith("cpu"):
         return torch.device(device)
-    if device.startswith("cuds"):
+    if device.startswith("cuda"):
         if torch.cuda.is_available():
             return torch.device("cuda:0")
         else:
