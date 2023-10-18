@@ -254,7 +254,7 @@ def predict(cfg) -> list:
     prototypes, classes = load_centroids(cfg['centroids'])
     size = (cfg['imgsz'], cfg['imgsz'])
     batch_size = 4  # set to speed up
-    images_path = [cfg['data']] if os.path.isfile(cfg['data']) else [os.path.join(cfg['data'], f) for f in os.listdir(cfg['data'])]
+    images_path = [cfg['data']] if os.path.isfile(cfg['data']) else [os.path.join(cfg['data'], f) for f in sorted(os.listdir(cfg['data']))]
 
     model.eval()
     results = []
